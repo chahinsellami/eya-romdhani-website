@@ -1,0 +1,374 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /*
+    Color Palette — gallery white ground, charcoal structure, terracotta accent.
+
+    Three families, in strict hierarchy. The off-white is the dominant one: it
+    is the page ground, not a variant of it.
+
+    1. Gallery white (#FAF8F4) carries the page background, the navigation, the
+       filter bar, every section and every card. It is warm-neutral rather than
+       a pure #FFF, so the photographs read as prints pinned to a wall.
+    2. Charcoal (#1A1A1A) is the structural dark. It carries all body type on
+       the white (16.6:1) and the hero's photographic scrim, where the type sits
+       on a photograph rather than on the page.
+    3. Terracotta (#B4532A) is the single accent — the only saturated hue, kept
+       to links, focus rings, buttons and the small uppercase labels.
+
+    Supporting tones: Graphite (#242424) for the dark scheme's raised surfaces,
+    Stone (#7A736A) for quiet secondary text, and Terracotta lit (#E8855C) for
+    the accent when it has to sit on charcoal.
+
+    Contrast measured: Charcoal on white 16.6:1 · Terracotta on white 4.9:1 ·
+    White on charcoal 16.6:1 · Stone-lit on charcoal 7.4:1 · Terracotta lit on
+    charcoal 6.8:1. Every pair clears WCAG AA.
+  */
+
+  /* Palette primitives — the named tones, so the semantic mapping below (and
+     anything else that needs a specific tone) never repeats a hex value. */
+  --bone: #FAF8F4;
+  --bone-deep: #F0ECE4;
+  --bone-dimmer: #E6E1D7;
+  --charcoal: #1A1A1A;
+  --graphite: #242424;
+  --terracotta: #B4532A;
+  --terracotta-lit: #E8855C;
+  --stone: #7A736A;
+  --stone-lit: #B8B2A8;
+
+  /* Semantic mapping — the off-white is the default, dominant scheme. */
+  --bg-primary: var(--bone);
+  --bg-secondary: var(--bone-deep);
+  --bg-tertiary: var(--bone-dimmer);
+  --text-primary: var(--charcoal); /* 16.6:1 on --bg-primary */
+  --text-secondary: #5A564F; /* 7.2:1 */
+  /* Stone is 4.3:1 on the white — too low for body text — so the tertiary tone
+     is the same hue darkened until it clears AA. */
+  --text-tertiary: #6B665E; /* 5.4:1 */
+  --accent-primary: var(--terracotta); /* 4.9:1 on --bg-primary */
+  --accent-glow: rgba(180, 83, 42, 0.14);
+  /*
+    Danger colour for form errors and required-field markers. Tokenised rather
+    than left as Tailwind's red-400/red-500: those literals are tuned for a dark
+    page and measure ≈2.4:1 on this white ground, well under the 4.5:1 AA floor.
+    Both values below clear AA on their own scheme's ground.
+  */
+  --danger-text: #9B1C1C; /* 6.9:1 on --bg-secondary */
+  --danger-border: rgba(155, 28, 28, 0.55);
+  --danger-bg: rgba(155, 28, 28, 0.07);
+  --border-subtle: rgba(26, 26, 26, 0.13);
+  /*
+    Hero tokens. These deliberately do NOT flip with the colour scheme.
+
+    The hero is a full-bleed photograph with the name set over it, so its
+    contrast is decided by the image, not by the page's ground. When these were
+    tied to the scheme, light mode swapped the scrim to a cream wash and turned
+    the photograph into a pale ghost with near-invisible navigation on top of it.
+    A photograph is its own ground: the hero stays dark — near-black charcoal
+    rather than the page's white — in both schemes, and ends on a clean edge
+    against the white page below it.
+  */
+  --hero-scrim-strong: rgba(20, 20, 20, 0.70);
+  --hero-scrim-soft: rgba(20, 20, 20, 0.35);
+  --hero-solid: #141414;
+  --on-photo: var(--bone); /* 17.4:1 on --hero-solid */
+  --on-photo-dim: #B8B2A8; /* 9.1:1 on --hero-solid */
+  /*
+    Accent as used *on the hero photograph*.
+
+    The page accent flips between schemes (#B4532A on white, #E8855C on
+    charcoal) because each has to clear AA against its own ground. The hero's
+    ground is a photograph and stays dark in both schemes, so the deep
+    terracotta would land there at about 3.4:1 — fine for a label, marginal for
+    button text. On the photograph the lit terracotta is always the correct
+    accent.
+  */
+  --accent-on-photo: var(--terracotta-lit); /* 6.8:1 on --hero-solid */
+  /* Height reserved for the fixed social-proof bar. */
+  --social-bar-height: 3.25rem;
+  --nav-height: 4rem;
+
+  /* Typography — editorial serif display + clean grotesque body */
+  /*
+    next/font (layout.tsx) generates a hashed family name and exposes it as a
+    variable, so the literal family names below no longer resolve. The variable
+    comes first, with the old stack kept as the fallback for the brief moment
+    before the stylesheet/inline @font-face resolves.
+  */
+  --font-display: var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Fluid type scale */
+  --step--1: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --step-3: clamp(2.5rem, 1.6rem + 4.5vw, 4rem);
+  --step-4: clamp(3rem, 1.4rem + 8vw, 7rem);
+
+  /* Rhythm */
+  --space-section: clamp(5rem, 3rem + 8vw, 11rem);
+  --space-gutter: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+  --content-max: 76rem;
+  --measure: 62ch;
+
+  /* Motion */
+  --ease-hover: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-base: 320ms;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-height: 5rem;
+  }
+}
+
+/*
+ * Dark scheme — opt-in, not automatic.
+ *
+ * The white is the design, so it must not be overridden by a system preference:
+ * when this was a `prefers-color-scheme: dark` block, every visitor whose OS is
+ * set to dark (which is the common default) got charcoal instead of the gallery
+ * white the palette is built around. The charcoal scheme is still here in full —
+ * set `data-theme="dark"` on <html> to use it (a toggle or a route that sets it
+ * would be the natural way in). Every pair below clears WCAG AA.
+ */
+[data-theme="dark"] {
+  --bg-primary: var(--charcoal);
+  --bg-secondary: var(--graphite);
+  --bg-tertiary: #2E2E2E;
+  --text-primary: var(--bone); /* 16.6:1 */
+  --text-secondary: #C4BFB6; /* 9.9:1 */
+  --text-tertiary: var(--stone-lit); /* 7.4:1 */
+  --accent-primary: var(--terracotta-lit); /* 6.8:1 on --bg-primary */
+  --accent-glow: rgba(232, 133, 92, 0.22);
+  /* Dark-scheme danger: the deep terracotta-red is invisible here (≈3.2:1), so
+     the error colour has to lighten rather than darken. */
+  --danger-text: #FCA5A5; /* 8.1:1 on --bg-primary */
+  --danger-border: rgba(248, 113, 113, 0.6);
+  --danger-bg: rgba(248, 113, 113, 0.1);
+  --border-subtle: rgba(250, 248, 244, 0.16);
+}
+
+/*
+ * Browser chrome stays light in both cases.
+ *
+ * The page ground is always the off-white, so `color-scheme: dark` would paint
+ * dark native scrollbars and form controls onto it. The opt-in charcoal scheme
+ * re-declares this inside its own block below.
+ */
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  /* Keep the fixed agency bar from covering the end of the page. */
+  padding-bottom: var(--social-bar-height);
+  font-family: var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /*
+   * Scroll reveals animate from `opacity: 0`, which JS-based detection can miss.
+   * Force them visible in CSS (an !important declaration beats the inline style
+   * framer writes) so reduced-motion users never see blank sections.
+   */
+  .reveal-block {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Editorial type primitives */
+.display-hero {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-4);
+  line-height: 0.92;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.display-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-3);
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+}
+
+.eyebrow {
+  font-size: var(--step--1);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.prose-editorial {
+  max-width: var(--measure);
+  color: var(--text-secondary);
+}
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  /*
+   * Focus rings. The previous ring used --accent-glow, a 18%-opacity shadow that
+   * measured ~1.3:1 against the page — invisible in practice. A solid accent
+   * outline with an offset ring stays above 3:1 and is shape-distinct, not just
+   * colour-distinct.
+   */
+  *:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .cinematic-button {
+    @apply inline-flex items-center justify-center border px-8 py-3 text-xs uppercase tracking-widest transition-all duration-300;
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+
+  .cinematic-button:hover,
+  .cinematic-button:focus-visible {
+    background-color: var(--accent-primary);
+    color: var(--bg-primary);
+  }
+
+  /*
+   * Same control, but on the hero photograph, which stays dark in both colour
+   * schemes. Uses the fixed on-photo accent and a fixed dark fill on hover —
+   * the base variant's `color: var(--bg-primary)` would invert to cream text on
+   * the lit-oxblood fill, which is 3.1:1.
+   */
+  .cinematic-button-on-photo {
+    @apply inline-flex items-center justify-center border px-8 py-3 text-xs uppercase tracking-widest transition-all duration-300;
+    border-color: var(--accent-on-photo);
+    color: var(--accent-on-photo);
+  }
+
+  .cinematic-button-on-photo:hover,
+  .cinematic-button-on-photo:focus-visible {
+    background-color: var(--accent-on-photo);
+    color: var(--hero-solid);
+  }
+
+  /*
+   * One content shell for the whole page.
+   *
+   * Sections, the nav, the filter bar, the agency bar and every inner block all
+   * use `.shell`, so their left and right content edges are identical. The
+   * previous mix of `max-w-6xl` (1152), `max-w-4xl` (896) and `max-w-2xl` (672)
+   * wrappers inside a 1216px section shell produced four different left edges.
+   */
+  .shell {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--space-gutter);
+  }
+
+  .section-shell {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--space-gutter);
+    padding-block: var(--space-section);
+  }
+
+  /* A shell nested inside a section shell must not re-apply the gutter. */
+  .section-shell > .shell,
+  .shell > .shell {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  /* Underline that grows from the left on hover — used for inline links */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-base) var(--ease-hover);
+  }
+
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .link-underline::after {
+      transition: none;
+      transform: scaleX(1);
+    }
+  }
+
+  /* Slim accent scrollbar */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-primary) transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--accent-primary) 60%, transparent);
+    border-radius: 999px;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+  }
+}
