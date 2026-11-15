@@ -1,6 +1,22 @@
-# Evelyn Rose — Runway Model Portfolio
+# Aya Romdhani — Runway & Editorial Model
 
-A cinematic portfolio site built with Next.js (App Router), TypeScript, Tailwind CSS and React Three Fiber.
+Portfolio site for runway and editorial model Aya Romdhani (Sousse, Tunisia),
+built with Next.js (App Router), TypeScript, Tailwind CSS and React Three Fiber.
+
+## Colour
+
+Gallery white (`#FAF8F4`) is the dominant ground: the page, navigation, filter
+bar and every card sit on it. Charcoal (`#1A1A1A`) carries the body type and the
+hero's photographic scrim, and terracotta (`#B4532A`) is the single accent, used
+only for links, focus rings, buttons and small uppercase labels. All tokens are
+declared once in `src/app/globals.css` and consumed through the semantic
+variables, so no component hardcodes a colour.
+
+The charcoal scheme is **opt-in**, not automatic: it lives in
+`[data-theme="dark"]` on `<html>`. The white ground is the design, so tying it to
+`prefers-color-scheme` would flip the entire page for any visitor whose OS is set
+to dark. `:root` declares `color-scheme: light` so native scrollbars and form
+controls match the white ground.
 
 ## Setup
 
@@ -123,8 +139,9 @@ fire `hashchange`, which is why the two used to disagree).
   number written down here; it moves with every dependency change.
 - Capped pixel ratio (max 1.75), local lights only — no remote HDRI fetch, so the
   hero renders offline.
-- Canvas background follows the colour scheme, and the starfield is skipped in
-  light mode.
+- Canvas background follows the opt-in `data-theme` attribute (cream-white or
+  charcoal), read through a `MutationObserver`; the starfield only renders in the
+  charcoal scheme.
 
 ## Deployment
 
@@ -133,4 +150,4 @@ no configuration.
 
 ## License
 
-© Evelyn Rose. All rights reserved.
+© Aya Romdhani. All rights reserved.
