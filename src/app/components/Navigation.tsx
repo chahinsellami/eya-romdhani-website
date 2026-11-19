@@ -1,36 +1,27 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
+import { Menu, X } from "lucide-react";
 import { portfolio } from "../../data/portfolio";
 import { syncFilterFromHash } from "../../lib/portfolio-filter";
 import { preferredScrollBehavior } from "../../lib/motion";
 
 const NAV_ITEMS = [
   { id: "about", label: "About" },
+  { id: "comp-card", label: "Comp Card" },
   { id: "portfolio", label: "Portfolio" },
-  { id: "contact", label: "Contact" },
+  { id: "contact", label: "Inquiries" },
 ] as const;
 
 type NavSectionId = (typeof NAV_ITEMS)[number]["id"];
-
-// The menu button's colour is set at the call site — it sits on the photograph
-// before scroll and on the page ground after, so a fixed token here would be
-// wrong half the time.
-const MENU_BUTTON =
-  "inline-flex h-10 w-10 items-center justify-center rounded-sm " +
-  "transition-colors duration-300 focus-visible:outline-none " +
-  "focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] md:hidden";
-const NAV_LINK =
-  "rounded-sm text-xs uppercase tracking-[0.15em] transition-colors duration-300 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]";
 
 function isNavSectionId(id: string): id is NavSectionId {
   return NAV_ITEMS.some((item) => item.id === id);
 }
 
 function findActiveSection(): NavSectionId | null {
-  const scrollPosition = window.scrollY + 200;
+  const scrollPosition = window.scrollY + 180;
 
   for (const item of NAV_ITEMS) {
     const element = document.getElementById(item.id);
@@ -58,7 +49,7 @@ export default function Navigation({ onNavigate }: NavigationProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(window.scrollY > 24);
       setActiveSection(findActiveSection());
     };
 
@@ -71,7 +62,6 @@ export default function Navigation({ onNavigate }: NavigationProps) {
     };
   }, []);
 
-  // Mobile menu: escape to close, lock background scroll while open.
   useEffect(() => {
     if (!isMenuOpen) return;
 
@@ -92,7 +82,6 @@ export default function Navigation({ onNavigate }: NavigationProps) {
     };
   }, [isMenuOpen]);
 
-  // Move focus into the menu when it opens so keyboard users land inside it.
   useEffect(() => {
     if (isMenuOpen) firstMenuItemRef.current?.focus();
   }, [isMenuOpen]);
@@ -104,11 +93,7 @@ export default function Navigation({ onNavigate }: NavigationProps) {
     const element = document.getElementById(id);
     const wasMenuOpen = isMenuOpen;
 
-    // Close first: while the mobile menu is open the body is scroll-locked, and
-    // scrollIntoView() is a no-op against a locked body. Scroll on the next
-    // frame, after the menu's cleanup has restored scrolling.
     setIsMenuOpen(false);
-
     if (!element) return;
 
     const scroll = () =>
@@ -121,102 +106,81 @@ export default function Navigation({ onNavigate }: NavigationProps) {
     }
 
     window.history.replaceState(null, "", `#${id}`);
-    // The hash is shared with the portfolio filter; let subscribers re-read it.
     syncFilterFromHash();
 
-    // Selecting an item unmounts the focused menu button, which would drop
-    // focus to <body> and strand keyboard users at the top of the document.
-    // Returning it to the toggle keeps the menu button as the stable anchor,
-    // matching what Escape already does.
     if (wasMenuOpen) {
       requestAnimationFrame(() => menuButtonRef.current?.focus());
     }
   };
 
-  // Derived from the name rather than hardcoded, so a rename cannot leave the
-  // monogram spelling the previous model's initials.
-  const logoLabel =
-    portfolio.name
-      .split(" ")
-      .map((part) => part.charAt(0))
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || portfolio.name.slice(0, 2).toUpperCase();
-
-  // Over the hero the bar floats on a photograph, which stays dark in both
-  // colour schemes — so its type uses the on-photo tokens rather than the page's
-  // text tokens. Once scrolled it sits on the page ground and flips normally.
-  // Without this split, light mode put near-black navigation text on a dark
-  // photograph: the links measured roughly 1.3:1 and effectively vanished.
-  const onHero = !isScrolled && !isMenuOpen;
-  const markColor = onHero ? "text-[var(--on-photo)]" : "text-[var(--text-primary)]";
-  const idleColor = onHero ? "text-[var(--on-photo-dim)]" : "text-[var(--text-tertiary)]";
-  const activeColor = onHero ? "text-[var(--on-photo)]" : "text-[var(--text-primary)]";
-
   return (
-    <nav
-      className={`fixed left-0 right-0 top-0 z-40 transition-all duration-300 ${
+    <header
+      className={`fixed left-0 right-0 top-0 z-40 transition-colors duration-200 ${
         isScrolled || isMenuOpen
-          ? "border-b border-[var(--border-subtle)] bg-[var(--bg-primary)]/95 backdrop-blur-sm"
-          : "bg-transparent"
+          ? "border-b border-[var(--border-subtle)] bg-[var(--bg-primary)]/95 backdrop-blur-md"
+          : "border-b border-transparent bg-[var(--bg-primary)]/80 backdrop-blur-sm"
       }`}
-      aria-label="Main navigation"
     >
       <div className="shell">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: preferredScrollBehavior() })}
-            className={`${NAV_LINK} ${markColor} hover:text-[var(--accent-primary)]`}
-            aria-label={`${portfolio.name} — back to top`}
+        <div className="flex h-16 items-center justify-between gap-8 md:h-20">
+          {/* Zone 1: Brand wordmark (single text element) */}
+          <a
+            href="#top"
+            onClick={(event) => {
+              event.preventDefault();
+              window.scrollTo({ top: 0, behavior: preferredScrollBehavior() });
+            }}
+            className="font-display text-2xl font-normal tracking-tight text-[var(--text-primary)] transition-colors duration-200 hover:text-[var(--accent-primary)] whitespace-nowrap shrink-0"
           >
-            {logoLabel}
-          </button>
+            {portfolio.name}
+          </a>
 
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => scrollToSection(item.id)}
-                className={`${NAV_LINK} ${
-                  activeSection === item.id
-                    ? activeColor
-                    : `${idleColor} hover:text-[var(--text-primary)]`
-                }`}
-                aria-current={activeSection === item.id ? "location" : undefined}
-              >
-                {item.label}
-              </button>
-            ))}
+          {/* Zone 2: Concise single-line nav links */}
+          <nav
+            className="hidden items-center gap-8 md:flex"
+            aria-label="Primary navigation"
+          >
+            {NAV_ITEMS.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => scrollToSection(item.id)}
+                  aria-current={isActive ? "location" : undefined}
+                  className={`link-underline text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0 ${
+                    isActive
+                      ? "text-[var(--accent-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Zone 3: Single primary CTA + mobile drawer toggle */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => scrollToSection("contact")}
+              className="hidden bg-[var(--text-primary)] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.16em] text-[var(--bg-primary)] transition-colors duration-200 hover:bg-[var(--accent-primary)] hover:text-white whitespace-nowrap shrink-0 md:inline-flex"
+            >
+              Book Aya
+            </button>
+
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              className="inline-flex h-10 w-10 items-center justify-center border border-[var(--border-subtle)] text-[var(--text-primary)] transition-colors duration-200 hover:border-[var(--text-primary)] md:hidden"
+              aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isMenuOpen}
+            >
+              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
           </div>
-
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setIsMenuOpen((open) => !open)}
-            className={`${MENU_BUTTON} ${markColor} hover:text-[var(--accent-primary)]`}
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isMenuOpen}
-          >
-            <span className="relative block h-3 w-5" aria-hidden="true">
-              <span
-                className={`absolute left-0 top-0 h-0.5 w-5 bg-current transition-transform duration-300 ${
-                  isMenuOpen ? "translate-y-[5px] rotate-45" : ""
-                }`}
-              />
-              <span
-                className={`absolute left-0 top-[5px] h-0.5 w-5 bg-current transition-opacity duration-200 ${
-                  isMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`absolute left-0 top-[10px] h-0.5 w-5 bg-current transition-transform duration-300 ${
-                  isMenuOpen ? "-translate-y-[5px] -rotate-45" : ""
-                }`}
-              />
-            </span>
-          </button>
         </div>
 
         <AnimatePresence>
@@ -227,35 +191,38 @@ export default function Navigation({ onNavigate }: NavigationProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              // The panel needs its own opaque ground. The nav bar above it is
-              // opaque while the menu is open, but this panel is a sibling, so
-              // without a background the hero wordmark showed straight through
-              // the links and made them unreadable.
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden border-t border-[var(--border-subtle)] bg-[var(--bg-primary)] md:hidden"
             >
-              <div className="py-4 space-y-1">
+              <div className="flex flex-col py-4">
                 {NAV_ITEMS.map((item, index) => (
                   <button
                     key={item.id}
                     ref={index === 0 ? firstMenuItemRef : undefined}
                     type="button"
                     onClick={() => scrollToSection(item.id)}
-                    className={`block w-full px-4 py-3 text-left text-xs uppercase tracking-[0.15em] transition-colors duration-300 ${
-                      activeSection === item.id
-                        ? "text-[var(--text-primary)]"
-                        : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
-                    }`}
                     aria-current={activeSection === item.id ? "location" : undefined}
+                    className={`flex items-center justify-between px-2 py-3.5 text-left text-xs font-medium uppercase tracking-[0.18em] transition-colors duration-200 ${
+                      activeSection === item.id
+                        ? "text-[var(--accent-primary)]"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    }`}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("contact")}
+                  className="mt-3 w-full bg-[var(--text-primary)] px-5 py-3 text-center text-xs font-medium uppercase tracking-[0.16em] text-[var(--bg-primary)] transition-colors duration-200 hover:bg-[var(--accent-primary)]"
+                >
+                  Book Aya
+                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </nav>
+    </header>
   );
 }

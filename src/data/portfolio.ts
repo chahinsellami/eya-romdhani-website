@@ -56,6 +56,7 @@ export const PortfolioItemSchema = z.object({
   id: z.string().uuid("Portfolio item ID must be a valid UUID"),
   title: z.string().min(1, "Title is required"),
   path: z.string().min(1, "Image path is required"),
+  widePath: z.string().optional(),
   category: z.enum(["Runway", "Editorial", "Campaign", "Commercial"]),
   brand: z.string().min(1, "Brand is required"),
   collection: z.string().optional(),
@@ -101,9 +102,15 @@ export const ContactSchema = z.object({
  * Measurements with standardized units and validation.
  */
 export const MeasurementsSchema = z.object({
-  bust: z.string().regex(/^(\d+)(['"]?)?$/, "Bust must be a number with optional inch quote"),
-  waist: z.string().regex(/^(\d+)(['"]?)?$/, "Waist must be a number with optional inch quote"),
-  hips: z.string().regex(/^(\d+)(['"]?)?$/, "Hips must be a number with optional inch quote"),
+  bust: z
+    .string()
+    .regex(/^(\d+)(\s?(cm|'|"))?$/i, "Bust must be a number with optional cm or inch unit"),
+  waist: z
+    .string()
+    .regex(/^(\d+)(\s?(cm|'|"))?$/i, "Waist must be a number with optional cm or inch unit"),
+  hips: z
+    .string()
+    .regex(/^(\d+)(\s?(cm|'|"))?$/i, "Hips must be a number with optional cm or inch unit"),
 });
 
 /**
@@ -209,13 +216,13 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
   // Physical Profile
   height: 177, // cm
   measurements: {
-    bust: "34\"",
-    waist: "24\"",
-    hips: "34\"",
+    bust: "84 cm",
+    waist: "66 cm",
+    hips: "99 cm",
   },
   stats: {
     height: 177,
-    shoeSize: "8 US",
+    shoeSize: "40 EU",
     hair: "Brunette",
     eyes: "Hazel",
     bloodType: "A+",
@@ -290,6 +297,7 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
       id: "ebcd7890-1234-5678-90ab-cdef0123456b",
       title: "Golden Hour",
       path: "/images/portfolio/tile-golden.webp",
+      widePath: "/images/portfolio/golden-hour.webp",
       category: "Campaign",
       brand: "Evening",
       collection: "Open-back dress",
@@ -301,6 +309,7 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
       id: "ebcd7890-1234-5678-90ab-cdef0123456c",
       title: "Close Study",
       path: "/images/portfolio/tile-closeup.webp",
+      widePath: "/images/portfolio/closeup-hands.webp",
       category: "Editorial",
       brand: "Studio",
       collection: "Portrait series",
@@ -312,6 +321,7 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
       id: "ebcd7890-1234-5678-90ab-cdef0123456d",
       title: "Hand Study",
       path: "/images/portfolio/tile-hands.webp",
+      widePath: "/images/portfolio/hand-over-face.webp",
       category: "Commercial",
       brand: "Beauty",
       collection: "Beauty test",
@@ -323,11 +333,12 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
       id: "ebcd7890-1234-5678-90ab-cdef0123456e",
       title: "Star Study",
       path: "/images/portfolio/tile-stars.webp",
+      widePath: "/images/portfolio/stars-colour.webp",
       category: "Editorial",
       brand: "Studio",
       collection: "Black & white series",
       featuredIn: ["Editorial"],
-      alt: "Black and white portrait of the model with a hand across her face and star stickers scattered over the frame",
+      alt: "Portrait of the model with a hand across her face and star stickers scattered over the frame",
       position: "50% 35%",
     },
   ],
@@ -339,13 +350,11 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
   // URLs with the model's own shots; both are optional, and the layout falls
   // back to type only if they are removed.
   hero: {
-    // Portrait crop is the phone fallback; the wide crop carries desktop, where
-    // a 3:4 image stretched across a 16:9 viewport loses both sides of the frame.
-    path: "/images/portfolio/hero-stars-portrait.webp",
-    widePath: "/images/portfolio/hero-stars.webp",
-    alt: "Black and white close portrait of Aya with one hand raised across her face, looking directly at the camera, star stickers scattered across the frame",
-    position: "58% 35%",
-    credit: "Studio — black & white series",
+    path: "/images/portfolio/portrait-turtleneck-full.webp",
+    widePath: "/images/portfolio/portrait-turtleneck-full.webp",
+    alt: "Black and white studio portrait of Aya Romdhani in a black turtleneck against architectural window shadows",
+    position: "50% 18%",
+    credit: "Turtleneck Study — Studio",
   },
   portrait: {
     path: "/images/portfolio/golden-hour-portrait.webp",
@@ -362,8 +371,8 @@ export const portfolio: Portfolio = PortfolioSchema.parse({
     youtube: "",
   },
   contact: {
-    email: "hello@ayaromdhani.com",
-    management: "hello@ayaromdhani.com",
+    email: "eyaromdhani16@gmail.com",
+    management: "eyaromdhani16@gmail.com",
     // Independent — no agency name or address to print.
     phone: "",
   },

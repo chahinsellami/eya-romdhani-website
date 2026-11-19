@@ -1,53 +1,48 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import type { PortfolioItem } from "../../data/portfolio";
 
 interface LightboxProps {
   isOpen: boolean;
-  imageUrl: string;
+  items: PortfolioItem[];
+  activeIndex: number;
+  onSelectIndex: (index: number) => void;
   onClose: () => void;
-  altText: string;
-  onPrev?: () => void;
-  onNext?: () => void;
-  index?: number;
-  total?: number;
+  onPrev: () => void;
+  onNext: () => void;
 }
 
 const FOCUSABLE = 'button, [href], [tabindex]:not([tabindex="-1"])';
 
 export default function Lightbox({
   isOpen,
-  imageUrl,
+  items,
+  activeIndex,
+  onSelectIndex,
   onClose,
-  altText,
   onPrev,
   onNext,
-  index,
-  total,
 }: LightboxProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  /**
-   * Gates the "Loading image" live-region text. It starts false and flips true
-   * on the following frame, so the region mounts empty and the text arrives as a
-   * change — which is the only thing a live region announces.
-   */
-  const [announceLoading, setAnnounceLoading] = useState(false);
 
-  // Reset the loading state whenever the displayed image changes.
+  const currentItem = items[activeIndex] ?? null;
+  const imageUrl = currentItem?.path ?? "";
+  const altText =
+    currentItem?.alt ||
+    (currentItem ? `${currentItem.title} by ${currentItem.brand}` : "");
+
   useEffect(() => {
     setIsLoaded(false);
     setHasError(false);
-    setAnnounceLoading(false);
-    const frame = requestAnimationFrame(() => setAnnounceLoading(true));
-    return () => cancelAnimationFrame(frame);
   }, [imageUrl]);
 
-  // Keyboard: Escape closes, arrows step, Tab is trapped inside the dialog.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -57,12 +52,12 @@ export default function Lightbox({
         onClose();
         return;
       }
-      if (event.key === "ArrowLeft" && onPrev) {
+      if (event.key === "ArrowLeft") {
         event.preventDefault();
         onPrev();
         return;
       }
-      if (event.key === "ArrowRight" && onNext) {
+      if (event.key === "ArrowRight") {
         event.preventDefault();
         onNext();
         return;
@@ -77,7 +72,10 @@ export default function Lightbox({
         const last = focusable[focusable.length - 1];
         const active = document.activeElement;
 
-        if (event.shiftKey && (active === first || !overlayRef.current.contains(active))) {
+        if (
+          event.shiftKey &&
+          (active === first || !overlayRef.current.contains(active))
+        ) {
           event.preventDefault();
           last.focus();
         } else if (!event.shiftKey && active === last) {
@@ -91,12 +89,13 @@ export default function Lightbox({
     return () => document.removeEventListener("keydown", listener);
   }, [isOpen, onClose, onPrev, onNext]);
 
-  // Move focus into the dialog on open and restore it on close.
   useEffect(() => {
     if (!isOpen) return;
 
     previouslyFocused.current = document.activeElement as HTMLElement | null;
-    const focusTimer = requestAnimationFrame(() => closeButtonRef.current?.focus());
+    const focusTimer = requestAnimationFrame(() =>
+      closeButtonRef.current?.focus(),
+    );
 
     return () => {
       cancelAnimationFrame(focusTimer);
@@ -104,7 +103,6 @@ export default function Lightbox({
     };
   }, [isOpen]);
 
-  // Lock background scroll while open without clobbering a previously set value.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -116,7 +114,6 @@ export default function Lightbox({
   }, [isOpen]);
 
   const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
-    // A click on the padded dialod body must not close, only the bare backdrop.
     if (event.currentTarget === event.target) {
       onClose();
     }
@@ -124,147 +121,143 @@ export default function Lightbox({
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && currentItem && (
         <motion.div
           ref={overlayRef}
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
-          aria-label="Image viewer"
-          className="fixed inset-0 z-50 flex items-center justify-center focus:outline-none"
+          aria-label={`Viewing ${currentItem.title}`}
+          data-cursor-surface="dark"
+          className="fixed inset-0 z-50 flex flex-col justify-between bg-[#0C0C0E]/96 text-[#F7F7F5] backdrop-blur-md focus:outline-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div
-            className="absolute inset-0 bg-black/90 backdrop-blur-sm"
-            onClick={handleBackdropClick}
-            aria-hidden="true"
-          />
+          {/* Top bar */}
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
+            <div className="flex min-w-0 items-baseline gap-4">
+              <span className="font-mono text-xs tabular-nums text-[#F04759]">
+                {String(activeIndex + 1).padStart(2, "0")} /{" "}
+                {String(items.length).padStart(2, "0")}
+              </span>
+              <div className="min-w-0">
+                <h3 className="truncate font-display text-xl font-normal text-[#F7F7F5]">
+                  {currentItem.title}
+                </h3>
+                <p className="truncate text-xs text-white/60">
+                  {currentItem.category} · {currentItem.brand}
+                  {currentItem.collection ? ` · ${currentItem.collection}` : ""}
+                </p>
+              </div>
+            </div>
 
-          <motion.div
-            className="relative flex max-h-[90vh] w-full max-w-5xl items-center justify-center p-4"
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.05 }}
-          >
             <button
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              className="absolute right-2 top-2 z-10 rounded-full bg-black/60 p-3 text-white/70 transition-colors duration-200 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+              className="inline-flex h-10 items-center gap-2 border border-white/20 px-3 text-xs uppercase tracking-[0.16em] text-white/80 transition-colors duration-200 hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F04759]"
               aria-label="Close lightbox"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              <span className="hidden sm:inline">Close</span>
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
+          </div>
 
-            {/*
-              The "Loading" text is injected after mount, not rendered with the
-              region. A live region announces changes to its content, so text
-              that is already present when the region mounts is usually never
-              announced at all.
-            */}
-            {!isLoaded && !hasError && (
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                role="status"
-                aria-live="polite"
-              >
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border-subtle)] border-t-white/80" />
-                {announceLoading && <span className="sr-only">Loading image</span>}
-              </div>
-            )}
-
-            {hasError ? (
-              <p className="bg-[var(--bg-secondary)] px-6 py-10 text-sm text-[var(--text-secondary)]">
-                This image could not be loaded. Please try again later.
-              </p>
-            ) : (
-              <motion.img
-                key={imageUrl}
-                src={imageUrl}
-                alt={altText}
-                onLoad={() => setIsLoaded(true)}
-                onError={() => setHasError(true)}
-                className={`max-h-[90vh] max-w-full object-contain transition-opacity duration-300 ${
-                  isLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-4 text-xs uppercase tracking-widest text-white/60"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          {/* Center photographic stage */}
+          <div
+            className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-4 sm:px-14"
+            onClick={handleBackdropClick}
           >
-            {(onPrev || onNext) && (
-              <>
-                <button
-                  type="button"
-                  onClick={onPrev}
-                  aria-label="Previous image"
-                  className="flex items-center gap-2 p-3 transition-colors duration-200 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden="true"
-                  >
-                    <line x1="19" y1="12" x2="5" y2="12" />
-                    <polyline points="12 19 5 12 12 5" />
-                  </svg>
-                  <span className="hidden sm:inline">Previous</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={onNext}
-                  aria-label="Next image"
-                  className="flex items-center gap-2 p-3 transition-colors duration-200 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-                >
-                  <span className="hidden sm:inline">Next</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden="true"
-                  >
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
-                {typeof index === "number" && typeof total === "number" && (
-                  <span className="tabular-nums text-white/70" aria-live="polite">
-                    {index + 1} / {total}
-                  </span>
-                )}
-              </>
+            {items.length > 1 && (
+              <button
+                type="button"
+                onClick={onPrev}
+                aria-label="Previous image"
+                className="absolute left-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-black/50 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:left-6"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              </button>
             )}
-          </motion.div>
+
+            <div className="relative flex max-h-[68vh] w-full max-w-4xl items-center justify-center">
+              {!isLoaded && !hasError && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                  <span className="sr-only">Loading image</span>
+                </div>
+              )}
+
+              {hasError ? (
+                <p className="border border-white/15 bg-white/5 px-6 py-10 text-sm text-white/75">
+                  This image could not be loaded. Please try again later.
+                </p>
+              ) : (
+                <motion.img
+                  key={imageUrl}
+                  src={imageUrl}
+                  alt={altText}
+                  referrerPolicy="no-referrer"
+                  onLoad={() => setIsLoaded(true)}
+                  onError={() => setHasError(true)}
+                  initial={{ opacity: 0, scale: 0.985 }}
+                  animate={{ opacity: isLoaded ? 1 : 0, scale: 1 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="max-h-[68vh] max-w-full object-contain"
+                />
+              )}
+            </div>
+
+            {items.length > 1 && (
+              <button
+                type="button"
+                onClick={onNext}
+                aria-label="Next image"
+                className="absolute right-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-black/50 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:right-6"
+              >
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom contact-sheet thumbnail strip */}
+          {items.length > 1 && (
+            <div className="border-t border-white/10 px-6 py-3">
+              <div className="scroll-slim mx-auto flex max-w-3xl items-center justify-start gap-2.5 overflow-x-auto sm:justify-center">
+                {items.map((item, idx) => {
+                  const isCurrent = idx === activeIndex;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => onSelectIndex(idx)}
+                      aria-label={`View ${item.title}`}
+                      aria-current={isCurrent ? "true" : undefined}
+                      className={`relative h-14 w-11 shrink-0 overflow-hidden border transition-all duration-200 ${
+                        isCurrent
+                          ? "border-[#F04759] opacity-100 ring-1 ring-[#F04759]"
+                          : "border-white/15 opacity-50 hover:opacity-85"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.path}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: item.position ?? "50% 30%" }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

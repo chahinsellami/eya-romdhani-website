@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
+import { motion } from "motion/react";
+import { LayoutGrid, List } from "lucide-react";
 import { portfolio } from "../../data/portfolio";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   FILTERS,
   readFilterFromHash,
@@ -11,15 +12,18 @@ import {
   type Filter,
 } from "../../lib/portfolio-filter";
 
-/**
- * Sticky category filter.
- *
- * The URL hash is the single source of truth (see src/lib/portfolio-filter.ts)
- * so this bar and the gallery grid stay in sync.
- */
-export default function PortfolioFilter() {
+export type GalleryViewMode = "grid" | "index";
+
+interface PortfolioFilterProps {
+  viewMode: GalleryViewMode;
+  onViewModeChange: (mode: GalleryViewMode) => void;
+}
+
+export default function PortfolioFilter({
+  viewMode,
+  onViewModeChange,
+}: PortfolioFilterProps) {
   const [activeCategory, setActiveCategory] = useState<Filter>("All");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -29,7 +33,6 @@ export default function PortfolioFilter() {
   }, []);
 
   const selectCategory = useCallback((category: Filter) => {
-    setIsMenuOpen(false);
     setFilter(category);
   }, []);
 
@@ -45,32 +48,11 @@ export default function PortfolioFilter() {
     { All: 0, Runway: 0, Editorial: 0, Campaign: 0, Commercial: 0 },
   );
 
-  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Categories with no items are not rendered, so they must not be reachable by
-  // keyboard either — cycling through FILTERS used to land on an empty
-  // "Commercial" and blank the grid.
   const visibleCategories = FILTERS.filter(
     (category) => category === "All" || counts[category] > 0,
   );
 
-  /**
-   * Arrow keys are a roving-selection shortcut for the desktop pill row, where
-   * every category is visible at once. They deliberately do nothing while the
-   * mobile dropdown is closed: the trigger button advertises a single current
-   * value, so silently changing it with Left/Right gave no feedback about what
-   * happened. Escape closes the open dropdown and returns focus to its trigger.
-   */
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Escape" && isMenuOpen) {
-      event.preventDefault();
-      setIsMenuOpen(false);
-      dropdownButtonRef.current?.focus();
-      return;
-    }
-
-    if (isMenuOpen) return;
-
     const currentIndex = visibleCategories.indexOf(activeCategory);
     if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
       event.preventDefault();
@@ -82,97 +64,82 @@ export default function PortfolioFilter() {
     }
   };
 
-  const itemCount = counts[activeCategory];
-
-  // Avoid an "All"-only flash before the hash is known on first paint.
   const resolvedCategory: Filter = mounted ? activeCategory : "All";
 
   return (
-    <div className="sticky top-[var(--nav-height)] z-20 -mx-[var(--space-gutter)] mb-12 bg-[var(--bg-primary)]/85 px-[var(--space-gutter)] py-3 backdrop-blur-md">
-        <div className="flex items-center justify-between gap-4">
-          {/* Desktop: inline pills */}
-          <div
-            className="hidden items-center gap-2 md:flex"
-            role="group"
-            aria-label="Filter portfolio by category"
-          >
-            {visibleCategories.map((category) => {
-              const isActive = resolvedCategory === category;
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => selectCategory(category)}
-                  className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] ${
-                    isActive
-                      ? "bg-[var(--accent-primary)] font-medium text-[var(--bg-primary)]"
-                      : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  {category}
-                  <span className="sr-only"> ({counts[category]} items)</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Mobile: dropdown */}
-          <div className="relative md:hidden" onKeyDown={handleKeyDown}>
-            <button
-              ref={dropdownButtonRef}
-              type="button"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="rounded-full bg-[var(--bg-tertiary)] px-4 py-2 text-xs uppercase tracking-widest text-[var(--text-secondary)] transition-colors duration-200 hover:text-[var(--text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-              aria-expanded={isMenuOpen}
-              aria-haspopup="true"
-            >
-              {resolvedCategory}
-              <span className="ml-1" aria-hidden="true">
-                ▾
-              </span>
-            </button>
-
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  id="portfolio-filter-menu"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-0 top-full z-30 mt-2 flex min-w-[180px] flex-col gap-1 border border-[var(--border-subtle)] bg-[var(--bg-secondary)] p-2 shadow-2xl"
-                >
-                  {visibleCategories.map((category) => {
-                    const isActive = resolvedCategory === category;
-                    return (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => selectCategory(category)}
-                        className={`px-4 py-3 text-left text-xs uppercase tracking-widest transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] ${
-                          isActive
-                            ? "bg-[var(--accent-primary)] font-medium text-[var(--bg-primary)]"
-                            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                        }`}
-                        aria-pressed={isActive}
-                      >
-                        {category}
-                        <span className="mt-1 block text-[11px] opacity-70">
-                          {counts[category]}{" "}
-                          {counts[category] === 1 ? "item" : "items"}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <p className="min-w-[70px] text-right text-xs text-[var(--text-tertiary)]">
-            {itemCount} {itemCount === 1 ? "item" : "items"}
-          </p>
+    <div className="no-print -mx-[var(--space-gutter)] mb-10 border-y border-[var(--border-subtle)] bg-[var(--bg-primary)]/95 px-[var(--space-gutter)] backdrop-blur-md md:sticky md:top-20 md:z-20 md:mb-12">
+      <div className="flex items-center justify-between gap-3 py-2 sm:gap-4 sm:py-2.5">
+        {/* Category filter tabs */}
+        <div
+          className="scroll-slim flex items-center gap-4 overflow-x-auto sm:gap-6"
+          role="group"
+          aria-label="Filter portfolio by category"
+          onKeyDown={handleKeyDown}
+        >
+          {visibleCategories.map((category) => {
+            const isActive = resolvedCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => selectCategory(category)}
+                aria-pressed={isActive}
+                className={`relative flex min-h-[40px] items-center gap-1.5 py-2 text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0 sm:gap-2 ${
+                  isActive
+                    ? "text-[var(--text-primary)]"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                <span>{category}</span>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--text-tertiary)]">
+                  {String(counts[category]).padStart(2, "0")}
+                </span>
+                {isActive && (
+                  <motion.span
+                    layoutId="portfolio-filter-indicator"
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-x-0 -bottom-2 h-0.5 bg-[var(--accent-primary)] sm:-bottom-2.5"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
+
+        {/* View switcher */}
+        <div
+          className="flex items-center gap-1 border border-[var(--border-subtle)] bg-[var(--bg-secondary)] p-0.5 shrink-0"
+          role="group"
+          aria-label="Gallery layout view"
+        >
+          <button
+            type="button"
+            onClick={() => onViewModeChange("grid")}
+            aria-pressed={viewMode === "grid"}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors duration-200 whitespace-nowrap shrink-0 ${
+              viewMode === "grid"
+                ? "bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-sm"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Grid</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewModeChange("index")}
+            aria-pressed={viewMode === "index"}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors duration-200 whitespace-nowrap shrink-0 ${
+              viewMode === "index"
+                ? "bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-sm"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            <List className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Index</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

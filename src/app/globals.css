@@ -4,185 +4,87 @@
 
 :root {
   /*
-    Color Palette — gallery white ground, charcoal structure, terracotta accent.
-
-    Three families, in strict hierarchy. The off-white is the dominant one: it
-    is the page ground, not a variant of it.
-
-    1. Gallery white (#FAF8F4) carries the page background, the navigation, the
-       filter bar, every section and every card. It is warm-neutral rather than
-       a pure #FFF, so the photographs read as prints pinned to a wall.
-    2. Charcoal (#1A1A1A) is the structural dark. It carries all body type on
-       the white (16.6:1) and the hero's photographic scrim, where the type sits
-       on a photograph rather than on the page.
-    3. Terracotta (#B4532A) is the single accent — the only saturated hue, kept
-       to links, focus rings, buttons and the small uppercase labels.
-
-    Supporting tones: Graphite (#242424) for the dark scheme's raised surfaces,
-    Stone (#7A736A) for quiet secondary text, and Terracotta lit (#E8855C) for
-    the accent when it has to sit on charcoal.
-
-    Contrast measured: Charcoal on white 16.6:1 · Terracotta on white 4.9:1 ·
-    White on charcoal 16.6:1 · Stone-lit on charcoal 7.4:1 · Terracotta lit on
-    charcoal 6.8:1. Every pair clears WCAG AA.
+    3-Color Editorial System:
+    Main 1 (Canvas 60%): Alabaster (#F7F7F5) & Pale Stone (#EEEEEA)
+    Main 2 (Structure 30%): Jet Obsidian (#0C0C0E) & Charcoal Surface (#151518)
+    Breaker (Accent 10%): Couture Crimson (#C81E32 on light / #F04759 on obsidian)
   */
+  --alabaster: #F7F7F5;
+  --alabaster-deep: #EEEEEA;
+  --alabaster-dimmer: #E2E2DC;
+  --obsidian: #0C0C0E;
+  --obsidian-surface: #151518;
+  --crimson: #C81E32;
+  --crimson-lit: #F04759;
 
-  /* Palette primitives — the named tones, so the semantic mapping below (and
-     anything else that needs a specific tone) never repeats a hex value. */
-  --bone: #FAF8F4;
-  --bone-deep: #F0ECE4;
-  --bone-dimmer: #E6E1D7;
-  --charcoal: #1A1A1A;
-  --graphite: #242424;
-  --terracotta: #B4532A;
-  --terracotta-lit: #E8855C;
-  --stone: #7A736A;
-  --stone-lit: #B8B2A8;
+  --bg-primary: var(--alabaster);
+  --bg-secondary: var(--alabaster-deep);
+  --bg-tertiary: var(--alabaster-dimmer);
+  --ink-bg: var(--obsidian);
+  --ink-surface: var(--obsidian-surface);
 
-  /* Semantic mapping — the off-white is the default, dominant scheme. */
-  --bg-primary: var(--bone);
-  --bg-secondary: var(--bone-deep);
-  --bg-tertiary: var(--bone-dimmer);
-  --text-primary: var(--charcoal); /* 16.6:1 on --bg-primary */
-  --text-secondary: #5A564F; /* 7.2:1 */
-  /* Stone is 4.3:1 on the white — too low for body text — so the tertiary tone
-     is the same hue darkened until it clears AA. */
-  --text-tertiary: #6B665E; /* 5.4:1 */
-  --accent-primary: var(--terracotta); /* 4.9:1 on --bg-primary */
-  --accent-glow: rgba(180, 83, 42, 0.14);
-  /*
-    Danger colour for form errors and required-field markers. Tokenised rather
-    than left as Tailwind's red-400/red-500: those literals are tuned for a dark
-    page and measure ≈2.4:1 on this white ground, well under the 4.5:1 AA floor.
-    Both values below clear AA on their own scheme's ground.
-  */
-  --danger-text: #9B1C1C; /* 6.9:1 on --bg-secondary */
+  --text-primary: var(--obsidian); /* 18.5:1 on --bg-primary */
+  --text-secondary: #45454A; /* 8.9:1 */
+  --text-tertiary: #636369; /* 5.6:1 */
+
+  --on-ink: var(--alabaster);
+  --on-ink-secondary: #B8B8BE;
+  --on-ink-tertiary: #8E8E96;
+
+  --accent-primary: var(--crimson); /* 5.2:1 on --bg-primary */
+  --accent-on-ink: var(--crimson-lit); /* 5.3:1 on --ink-bg */
+  --accent-glow: rgba(200, 30, 50, 0.14);
+
+  --danger-text: #9B1C1C;
   --danger-border: rgba(155, 28, 28, 0.55);
   --danger-bg: rgba(155, 28, 28, 0.07);
-  --border-subtle: rgba(26, 26, 26, 0.13);
-  /*
-    Hero tokens. These deliberately do NOT flip with the colour scheme.
+  --border-subtle: rgba(12, 12, 14, 0.12);
+  --border-strong: rgba(12, 12, 14, 0.28);
+  --border-on-ink: rgba(247, 247, 245, 0.14);
 
-    The hero is a full-bleed photograph with the name set over it, so its
-    contrast is decided by the image, not by the page's ground. When these were
-    tied to the scheme, light mode swapped the scrim to a cream wash and turned
-    the photograph into a pale ghost with near-invisible navigation on top of it.
-    A photograph is its own ground: the hero stays dark — near-black charcoal
-    rather than the page's white — in both schemes, and ends on a clean edge
-    against the white page below it.
-  */
-  --hero-scrim-strong: rgba(20, 20, 20, 0.70);
-  --hero-scrim-soft: rgba(20, 20, 20, 0.35);
-  --hero-solid: #141414;
-  --on-photo: var(--bone); /* 17.4:1 on --hero-solid */
-  --on-photo-dim: #B8B2A8; /* 9.1:1 on --hero-solid */
-  /*
-    Accent as used *on the hero photograph*.
+  --nav-height: 4.5rem;
 
-    The page accent flips between schemes (#B4532A on white, #E8855C on
-    charcoal) because each has to clear AA against its own ground. The hero's
-    ground is a photograph and stays dark in both schemes, so the deep
-    terracotta would land there at about 3.4:1 — fine for a label, marginal for
-    button text. On the photograph the lit terracotta is always the correct
-    accent.
-  */
-  --accent-on-photo: var(--terracotta-lit); /* 6.8:1 on --hero-solid */
-  /* Height reserved for the fixed social-proof bar. */
-  --social-bar-height: 3.25rem;
-  --nav-height: 4rem;
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
 
-  /* Typography — editorial serif display + clean grotesque body */
-  /*
-    next/font (layout.tsx) generates a hashed family name and exposes it as a
-    variable, so the literal family names below no longer resolve. The variable
-    comes first, with the old stack kept as the fallback for the brief moment
-    before the stylesheet/inline @font-face resolves.
-  */
-  --font-display: var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-  --font-body: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --step--1: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
+  --step-0: clamp(0.9375rem, 0.92rem + 0.15vw, 1.03125rem);
+  --step-3: clamp(2rem, 1.4rem + 2.8vw, 3.35rem);
+  --step-4: clamp(2.85rem, 1.9rem + 5.2vw, 6rem);
 
-  /* Fluid type scale */
-  --step--1: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
-  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
-  --step-3: clamp(2.5rem, 1.6rem + 4.5vw, 4rem);
-  --step-4: clamp(3rem, 1.4rem + 8vw, 7rem);
-
-  /* Rhythm */
-  --space-section: clamp(5rem, 3rem + 8vw, 11rem);
-  --space-gutter: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
-  --content-max: 76rem;
+  --space-section: clamp(4.5rem, 3rem + 5vw, 7.5rem);
+  --space-gutter: clamp(1.25rem, 0.8rem + 2vw, 3rem);
+  --content-max: 82rem;
   --measure: 62ch;
 
-  /* Motion */
-  --ease-hover: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-base: 320ms;
-}
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-base: 200ms;
 
-@media (min-width: 768px) {
-  :root {
-    --nav-height: 5rem;
-  }
-}
-
-/*
- * Dark scheme — opt-in, not automatic.
- *
- * The white is the design, so it must not be overridden by a system preference:
- * when this was a `prefers-color-scheme: dark` block, every visitor whose OS is
- * set to dark (which is the common default) got charcoal instead of the gallery
- * white the palette is built around. The charcoal scheme is still here in full —
- * set `data-theme="dark"` on <html> to use it (a toggle or a route that sets it
- * would be the natural way in). Every pair below clears WCAG AA.
- */
-[data-theme="dark"] {
-  --bg-primary: var(--charcoal);
-  --bg-secondary: var(--graphite);
-  --bg-tertiary: #2E2E2E;
-  --text-primary: var(--bone); /* 16.6:1 */
-  --text-secondary: #C4BFB6; /* 9.9:1 */
-  --text-tertiary: var(--stone-lit); /* 7.4:1 */
-  --accent-primary: var(--terracotta-lit); /* 6.8:1 on --bg-primary */
-  --accent-glow: rgba(232, 133, 92, 0.22);
-  /* Dark-scheme danger: the deep terracotta-red is invisible here (≈3.2:1), so
-     the error colour has to lighten rather than darken. */
-  --danger-text: #FCA5A5; /* 8.1:1 on --bg-primary */
-  --danger-border: rgba(248, 113, 113, 0.6);
-  --danger-bg: rgba(248, 113, 113, 0.1);
-  --border-subtle: rgba(250, 248, 244, 0.16);
-}
-
-/*
- * Browser chrome stays light in both cases.
- *
- * The page ground is always the off-white, so `color-scheme: dark` would paint
- * dark native scrollbars and form controls onto it. The opt-in charcoal scheme
- * re-declares this inside its own block below.
- */
-:root {
   color-scheme: light;
 }
 
-[data-theme="dark"] {
-  color-scheme: dark;
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
 }
 
 body {
   color: var(--text-primary);
   background: var(--bg-primary);
-  /* Keep the fixed agency bar from covering the end of the page. */
-  padding-bottom: var(--social-bar-height);
-  font-family: var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
-  -webkit-text-size-adjust: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -198,14 +100,27 @@ html {
     transition-duration: 0.001ms !important;
   }
 
-  /*
-   * Scroll reveals animate from `opacity: 0`, which JS-based detection can miss.
-   * Force them visible in CSS (an !important declaration beats the inline style
-   * framer writes) so reduced-motion users never see blank sections.
-   */
   .reveal-block {
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  nav,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  .section-shell {
+    padding-block: 1.5rem !important;
+    break-inside: avoid;
   }
 }
 
@@ -215,8 +130,8 @@ html {
   font-weight: 300;
   font-size: var(--step-4);
   line-height: 0.92;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .display-title {
@@ -224,12 +139,15 @@ html {
   font-weight: 400;
   font-size: var(--step-3);
   line-height: 1.05;
-  letter-spacing: 0.005em;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 .eyebrow {
-  font-size: var(--step--1);
-  letter-spacing: 0.28em;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
@@ -239,17 +157,30 @@ html {
   color: var(--text-secondary);
 }
 
+@keyframes editorial-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-editorial-marquee {
+  animation: editorial-marquee 38s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-editorial-marquee {
+    animation: none;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--border-subtle);
   }
 
-  /*
-   * Focus rings. The previous ring used --accent-glow, a 18%-opacity shadow that
-   * measured ~1.3:1 against the page — invisible in practice. A solid accent
-   * outline with an offset ring stays above 3:1 and is shape-distinct, not just
-   * colour-distinct.
-   */
   *:focus-visible {
     outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
@@ -258,43 +189,33 @@ html {
 
 @layer components {
   .cinematic-button {
-    @apply inline-flex items-center justify-center border px-8 py-3 text-xs uppercase tracking-widest transition-all duration-300;
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
+    @apply inline-flex items-center justify-center gap-2 border px-6 py-3 text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0;
+    border-color: var(--text-primary);
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
   }
 
   .cinematic-button:hover,
   .cinematic-button:focus-visible {
+    border-color: var(--accent-primary);
     background-color: var(--accent-primary);
-    color: var(--bg-primary);
+    color: #FFFFFF;
   }
 
-  /*
-   * Same control, but on the hero photograph, which stays dark in both colour
-   * schemes. Uses the fixed on-photo accent and a fixed dark fill on hover —
-   * the base variant's `color: var(--bg-primary)` would invert to cream text on
-   * the lit-oxblood fill, which is 3.1:1.
-   */
-  .cinematic-button-on-photo {
-    @apply inline-flex items-center justify-center border px-8 py-3 text-xs uppercase tracking-widest transition-all duration-300;
-    border-color: var(--accent-on-photo);
-    color: var(--accent-on-photo);
+  .cinematic-button-outline {
+    @apply inline-flex items-center justify-center gap-2 border px-6 py-3 text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0;
+    border-color: var(--border-strong);
+    background-color: transparent;
+    color: var(--text-primary);
   }
 
-  .cinematic-button-on-photo:hover,
-  .cinematic-button-on-photo:focus-visible {
-    background-color: var(--accent-on-photo);
-    color: var(--hero-solid);
+  .cinematic-button-outline:hover,
+  .cinematic-button-outline:focus-visible {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background-color: var(--bg-secondary);
   }
 
-  /*
-   * One content shell for the whole page.
-   *
-   * Sections, the nav, the filter bar, the agency bar and every inner block all
-   * use `.shell`, so their left and right content edges are identical. The
-   * previous mix of `max-w-6xl` (1152), `max-w-4xl` (896) and `max-w-2xl` (672)
-   * wrappers inside a 1216px section shell produced four different left edges.
-   */
   .shell {
     width: 100%;
     max-width: var(--content-max);
@@ -310,14 +231,12 @@ html {
     padding-block: var(--space-section);
   }
 
-  /* A shell nested inside a section shell must not re-apply the gutter. */
   .section-shell > .shell,
   .shell > .shell {
     max-width: none;
     padding-inline: 0;
   }
 
-  /* Underline that grows from the left on hover — used for inline links */
   .link-underline {
     position: relative;
     display: inline-block;
@@ -333,7 +252,7 @@ html {
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform var(--duration-base) var(--ease-hover);
+    transition: transform var(--duration-base) var(--ease-editorial);
   }
 
   .link-underline:hover::after,
@@ -348,7 +267,6 @@ html {
     }
   }
 
-  /* Slim accent scrollbar */
   .scroll-slim {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-primary) transparent;
@@ -364,11 +282,150 @@ html {
   }
 
   .scroll-slim::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--accent-primary) 60%, transparent);
+    background: color-mix(in srgb, var(--accent-primary) 55%, transparent);
     border-radius: 999px;
   }
 
   .scroll-slim::-webkit-scrollbar-thumb:hover {
     background: var(--accent-primary);
   }
+}
+
+/* Bespoke 3-color editorial custom cursor (fine mouse pointers only) */
+@media (hover: hover) and (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+.editorial-cursor {
+  opacity: 0;
+  transition: opacity 150ms var(--ease-editorial);
+}
+
+.editorial-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.editorial-cursor[data-mode="hidden"] {
+  opacity: 0;
+}
+
+.editorial-cursor-anchor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.editorial-cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--crimson);
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 150ms var(--ease-editorial),
+    opacity 150ms var(--ease-editorial),
+    background-color 150ms var(--ease-editorial);
+}
+
+.editorial-cursor-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1px solid rgba(12, 12, 14, 0.45);
+  background-color: transparent;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    width 200ms var(--ease-editorial),
+    height 200ms var(--ease-editorial),
+    transform 180ms var(--ease-editorial),
+    border-color 180ms var(--ease-editorial),
+    background-color 180ms var(--ease-editorial),
+    color 180ms var(--ease-editorial);
+}
+
+.editorial-cursor-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 140ms var(--ease-editorial);
+}
+
+/* Dark Obsidian surface adaptation */
+.editorial-cursor[data-surface="dark"] .editorial-cursor-dot {
+  background-color: var(--crimson-lit);
+}
+
+.editorial-cursor[data-surface="dark"] .editorial-cursor-ring {
+  border-color: rgba(247, 247, 245, 0.52);
+}
+
+/* Interactive links & buttons */
+.editorial-cursor[data-mode="interactive"] .editorial-cursor-dot {
+  transform: translate(-50%, -50%) scale(0.75);
+}
+
+.editorial-cursor[data-mode="interactive"] .editorial-cursor-ring {
+  width: 48px;
+  height: 48px;
+  border-color: var(--crimson);
+  background-color: rgba(200, 30, 50, 0.06);
+}
+
+.editorial-cursor[data-surface="dark"][data-mode="interactive"] .editorial-cursor-ring {
+  border-color: var(--crimson-lit);
+  background-color: rgba(240, 71, 89, 0.12);
+}
+
+/* Editorial photographic inspection lens ("VIEW" / "NEXT") */
+.editorial-cursor[data-mode="view"] .editorial-cursor-dot,
+.editorial-cursor[data-mode="next"] .editorial-cursor-dot {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2);
+}
+
+.editorial-cursor[data-mode="view"] .editorial-cursor-ring,
+.editorial-cursor[data-mode="next"] .editorial-cursor-ring {
+  width: 60px;
+  height: 60px;
+  border-color: var(--crimson);
+  background-color: var(--obsidian);
+  color: var(--alabaster);
+}
+
+.editorial-cursor[data-surface="dark"][data-mode="view"] .editorial-cursor-ring,
+.editorial-cursor[data-surface="dark"][data-mode="next"] .editorial-cursor-ring {
+  border-color: var(--crimson-lit);
+  background-color: var(--alabaster);
+  color: var(--obsidian);
+}
+
+.editorial-cursor[data-mode="view"] .editorial-cursor-label,
+.editorial-cursor[data-mode="next"] .editorial-cursor-label {
+  opacity: 1;
+}
+
+/* Click compression */
+.editorial-cursor[data-pressed="true"] .editorial-cursor-ring {
+  transform: translate(-50%, -50%) scale(0.84);
+}
+
+.editorial-cursor[data-pressed="true"] .editorial-cursor-dot {
+  transform: translate(-50%, -50%) scale(1.4);
 }

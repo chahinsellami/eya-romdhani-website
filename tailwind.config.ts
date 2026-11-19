@@ -21,12 +21,11 @@ const config: Config = {
         "accent-faint": "var(--accent-glow)",
       },
       fontFamily: {
-        // Read from the next/font CSS variables so utilities like `font-display`
-        // match the self-hosted files instead of a family that is not loaded.
-        display: ["var(--font-playfair)", "Playfair Display", "Georgia", "serif"],
-        body: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        serif: ["var(--font-playfair)", "Playfair Display", "serif"],
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
+        body: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        serif: ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
+        sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace", "monospace"],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
