@@ -1,13 +1,13 @@
 "use client";
 
-import { motion } from "motion/react";
 import { ArrowUpRight, ArrowDown } from "lucide-react";
 import type { Portfolio } from "../../data/portfolio";
+import { scrollToSectionById } from "../../lib/motion";
 import HeroPortrait from "./HeroPortrait";
 
 interface HeroSectionProps {
   data: Portfolio;
-  onNavigate: (id: string) => void;
+  onNavigate?: (id: string) => void;
 }
 
 const MARQUEE_ITEMS = [
@@ -21,6 +21,7 @@ const MARQUEE_ITEMS = [
 ];
 
 export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
+  const navigate = onNavigate ?? scrollToSectionById;
   const nameParts = data.name.trim().split(/\s+/);
   const firstName = nameParts[0] ?? data.name;
   const lastName = nameParts.slice(1).join(" ");
@@ -37,13 +38,8 @@ export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
     <section id="top" aria-label="Introduction" className="pt-16 md:pt-20">
       <div className="shell pt-6 pb-10 md:pt-14 md:pb-16">
         <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-10 lg:grid-cols-12 lg:gap-14">
-          {/* Left column: Typographic editorial masthead */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col justify-between lg:col-span-6 lg:py-4"
-          >
+          {/* Left column: Immediate-paint editorial masthead */}
+          <div className="flex flex-col justify-between lg:col-span-6 lg:py-4">
             <div>
               <p className="eyebrow text-[var(--accent-primary)]">
                 {data.title ?? "Runway & Editorial Model"}
@@ -71,7 +67,7 @@ export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
               <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <button
                   type="button"
-                  onClick={() => onNavigate("portfolio")}
+                  onClick={() => navigate("portfolio")}
                   className="cinematic-button w-full sm:w-auto"
                 >
                   <span>Explore Portfolio</span>
@@ -79,7 +75,7 @@ export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigate("contact")}
+                  onClick={() => navigate("contact")}
                   className="cinematic-button-outline w-full sm:w-auto"
                 >
                   <span>Booking Inquiries</span>
@@ -99,15 +95,10 @@ export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
                   : "Independent · Direct Bookings"}
               </span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right column: Single turtleneck editorial portrait showcase */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.985 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.65, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col lg:col-span-6"
-          >
+          <div className="flex flex-col lg:col-span-6">
             <HeroPortrait
               src={data.hero?.path}
               alt={data.hero?.alt}
@@ -115,7 +106,7 @@ export default function HeroSection({ data, onNavigate }: HeroSectionProps) {
               origin={data.origin}
               position={data.hero?.position}
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 

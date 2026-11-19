@@ -1,33 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
-/** Thin reading-progress rule. Purely decorative, so it is aria-hidden. */
+/** GPU-composited reading-progress rule with zero scroll-time React re-renders. */
 export default function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      // Guard against division by zero on pages shorter than the viewport.
-      setProgress(scrollable > 0 ? Math.min(100, (window.scrollY / scrollable) * 100) : 0);
+    const bar = barRef.current;
+    if (!bar) return;
+
+    let rafId = 0;
+
+    const update = () => {
+      rafId = 0;
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const ratio =
+        scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+
+      bar.style.transform = `scaleX(${ratio})`;
+      bar.style.opacity = ratio > 0.01 ? "1" : "0";
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
+    const onScrollOrResize = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize, { passive: true });
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
     };
   }, []);
 
-  if (progress < 1) return null;
-
   return (
     <div
-      className="fixed left-0 top-0 z-[60] h-0.5 bg-[var(--accent-primary)]"
-      style={{ width: `${progress}%` }}
+      ref={barRef}
+      className="fixed left-0 top-0 z-[60] h-0.5 w-full origin-left bg-[var(--accent-primary)] transition-opacity duration-150 will-change-transform"
+      style={{ transform: "scaleX(0)", opacity: 0 }}
       aria-hidden="true"
     />
   );

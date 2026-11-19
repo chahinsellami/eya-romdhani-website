@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { portfolio, type PortfolioItem } from "../../data/portfolio";
 import Reveal, { EDITORIAL_EASE, EDITORIAL_VIEWPORT } from "./Reveal";
-import Lightbox from "./Lightbox";
 import type { GalleryViewMode } from "./PortfolioFilter";
+
+const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
 import {
   readFilterFromHash,
   subscribeFilter,
@@ -29,7 +31,13 @@ export default function GallerySection({
   const currentData = data ?? portfolio;
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [hasOpenedLightbox, setHasOpenedLightbox] = useState(false);
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
+
+  const openLightboxAt = (index: number) => {
+    setHasOpenedLightbox(true);
+    setActiveIndex(index);
+  };
 
   useEffect(() => {
     setActiveFilter(readFilterFromHash());
@@ -101,7 +109,7 @@ export default function GallerySection({
               key={item.id}
               type="button"
               data-cursor="view"
-              onClick={() => setActiveIndex(index)}
+              onClick={() => openLightboxAt(index)}
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={EDITORIAL_VIEWPORT}
@@ -168,7 +176,7 @@ export default function GallerySection({
                 staggerSlot={idx}
                 aspectClass="aspect-[3/4]"
                 sizes="(max-width: 768px) 100vw, 33vw"
-                onOpen={() => setActiveIndex(idx)}
+                onOpen={() => openLightboxAt(idx)}
               />
             ))}
           </div>
@@ -186,7 +194,7 @@ export default function GallerySection({
                   useWide
                   aspectClass="aspect-[4/3]"
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  onOpen={() => setActiveIndex(globalIdx)}
+                  onOpen={() => openLightboxAt(globalIdx)}
                 />
               );
             })}
@@ -204,7 +212,7 @@ export default function GallerySection({
                   type="button"
                   data-cursor="view"
                   aria-label={`Open ${filteredItems[5].title} in the lightbox`}
-                  onClick={() => setActiveIndex(5)}
+                  onClick={() => openLightboxAt(5)}
                   className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
                 >
                   <motion.div
@@ -265,7 +273,7 @@ export default function GallerySection({
                 </p>
                 <button
                   type="button"
-                  onClick={() => setActiveIndex(5)}
+                  onClick={() => openLightboxAt(5)}
                   className="cinematic-button-outline mt-8"
                 >
                   <span>Open Full Frame</span>
@@ -285,7 +293,7 @@ export default function GallerySection({
               staggerSlot={index % 3}
               aspectClass="aspect-[3/4]"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              onOpen={() => setActiveIndex(index)}
+              onOpen={() => openLightboxAt(index)}
             />
           ))}
         </div>
@@ -297,15 +305,17 @@ export default function GallerySection({
         </p>
       )}
 
-      <Lightbox
-        isOpen={Boolean(activeItem)}
-        items={filteredItems}
-        activeIndex={activeIndex ?? 0}
-        onSelectIndex={setActiveIndex}
-        onClose={closeLightbox}
-        onPrev={showPrev}
-        onNext={showNext}
-      />
+      {hasOpenedLightbox && (
+        <Lightbox
+          isOpen={Boolean(activeItem)}
+          items={filteredItems}
+          activeIndex={activeIndex ?? 0}
+          onSelectIndex={setActiveIndex}
+          onClose={closeLightbox}
+          onPrev={showPrev}
+          onNext={showNext}
+        />
+      )}
     </div>
   );
 }

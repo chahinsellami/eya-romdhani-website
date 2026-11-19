@@ -1,8 +1,4 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "motion/react";
-import { EDITORIAL_EASE } from "./Reveal";
 
 interface HeroPortraitProps {
   src?: string;
@@ -24,23 +20,17 @@ export default function HeroPortrait({
       {/* Architectural Obsidian matte frame with Alabaster inner hairline & Crimson marker */}
       <div className="relative aspect-[3/4] max-h-[72svh] w-full flex-1 overflow-hidden border border-[var(--border-strong)] bg-[var(--ink-bg)] p-2.5 sm:max-h-none sm:p-3.5 lg:aspect-auto lg:min-h-[540px]">
         <div className="relative h-full w-full overflow-hidden border border-white/15 bg-[var(--ink-surface)]">
-          <motion.div
-            initial={{ scale: 1.03 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.75, ease: EDITORIAL_EASE }}
-            className="relative h-full w-full"
-          >
-            <Image
-              src={src}
-              alt={alt}
-              fill
-              priority
-              referrerPolicy="no-referrer"
-              sizes="(max-width: 1024px) 100vw, 48vw"
-              style={{ objectPosition: position }}
-              className="object-cover"
-            />
-          </motion.div>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority
+            fetchPriority="high"
+            referrerPolicy="no-referrer"
+            sizes="(max-width: 1024px) 100vw, 48vw"
+            style={{ objectPosition: position }}
+            className="object-cover"
+          />
         </div>
       </div>
 

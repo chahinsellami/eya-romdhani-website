@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { portfolio } from "../../data/portfolio";
 import { syncFilterFromHash } from "../../lib/portfolio-filter";
-import { preferredScrollBehavior } from "../../lib/motion";
+import { preferredScrollBehavior, scrollToSectionById } from "../../lib/motion";
 
 const NAV_ITEMS = [
   { id: "about", label: "About" },
@@ -18,22 +18,6 @@ type NavSectionId = (typeof NAV_ITEMS)[number]["id"];
 
 function isNavSectionId(id: string): id is NavSectionId {
   return NAV_ITEMS.some((item) => item.id === id);
-}
-
-function findActiveSection(): NavSectionId | null {
-  const scrollPosition = window.scrollY + 180;
-
-  for (const item of NAV_ITEMS) {
-    const element = document.getElementById(item.id);
-    if (!element) continue;
-
-    const { offsetTop, offsetHeight } = element;
-    if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-      return item.id;
-    }
-  }
-
-  return null;
 }
 
 interface NavigationProps {
@@ -49,17 +33,53 @@ export default function Navigation({ onNavigate }: NavigationProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 24);
-      setActiveSection(findActiveSection());
+      const scrolled = window.scrollY > 24;
+      setIsScrolled((prev) => (prev === scrolled ? prev : scrolled));
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const elements = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter(
+      (el): el is HTMLElement => el !== null,
+    );
+    if (elements.length === 0) return;
+
+    const visibleRatios = new Map<string, number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          visibleRatios.set(
+            entry.target.id,
+            entry.isIntersecting ? entry.intersectionRatio : 0,
+          );
+        }
+
+        let topId: NavSectionId | null = null;
+        let maxRatio = 0;
+        for (const item of NAV_ITEMS) {
+          const ratio = visibleRatios.get(item.id) ?? 0;
+          if (ratio > maxRatio) {
+            maxRatio = ratio;
+            topId = item.id;
+          }
+        }
+        setActiveSection(topId);
+      },
+      {
+        rootMargin: "-20% 0px -55% 0px",
+        threshold: [0, 0.15, 0.4, 0.7],
+      },
+    );
+
+    for (const el of elements) {
+      observer.observe(el);
+    }
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -90,19 +110,13 @@ export default function Navigation({ onNavigate }: NavigationProps) {
     if (!isNavSectionId(id)) return;
     if (onNavigate) onNavigate(id);
 
-    const element = document.getElementById(id);
     const wasMenuOpen = isMenuOpen;
-
     setIsMenuOpen(false);
-    if (!element) return;
-
-    const scroll = () =>
-      element.scrollIntoView({ behavior: preferredScrollBehavior(), block: "start" });
 
     if (wasMenuOpen) {
-      requestAnimationFrame(() => requestAnimationFrame(scroll));
+      requestAnimationFrame(() => requestAnimationFrame(() => scrollToSectionById(id)));
     } else {
-      scroll();
+      scrollToSectionById(id);
     }
 
     window.history.replaceState(null, "", `#${id}`);
