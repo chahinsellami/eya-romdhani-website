@@ -128,8 +128,8 @@ export default function Lightbox({
           role="dialog"
           aria-modal="true"
           aria-label={`Viewing ${currentItem.title}`}
-          data-cursor-surface="dark"
-          className="fixed inset-0 z-50 flex flex-col justify-between bg-[#0C0C0E]/96 text-[#F7F7F5] backdrop-blur-md focus:outline-none"
+         
+          className="fixed inset-0 z-50 flex flex-col justify-between bg-[var(--ink)] text-[var(--bone)] backdrop-blur-md focus:outline-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -138,17 +138,15 @@ export default function Lightbox({
           {/* Top bar */}
           <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
             <div className="flex min-w-0 items-baseline gap-4">
-              <span className="font-mono text-xs tabular-nums text-[#F04759]">
-                {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                {String(items.length).padStart(2, "0")}
+              <span className="text-[0.9375rem] tabular-nums text-white/60">
+                {activeIndex + 1} of {items.length}
               </span>
               <div className="min-w-0">
-                <h3 className="truncate font-display text-xl font-normal text-[#F7F7F5]">
+                <h3 className="truncate text-[0.9375rem] font-semibold">
                   {currentItem.title}
                 </h3>
-                <p className="truncate text-xs text-white/60">
-                  {currentItem.category} · {currentItem.brand}
-                  {currentItem.collection ? ` · ${currentItem.collection}` : ""}
+                <p className="truncate text-[0.8125rem] text-white/60">
+                  {[currentItem.category, currentItem.collection].filter(Boolean).join(", ")}
                 </p>
               </div>
             </div>
@@ -157,7 +155,7 @@ export default function Lightbox({
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              className="inline-flex h-10 items-center gap-2 border border-white/20 px-3 text-xs uppercase tracking-[0.16em] text-white/80 transition-colors duration-200 hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F04759]"
+              className="inline-flex h-11 items-center gap-2 px-2 text-[0.9375rem] font-semibold text-white/80 transition-colors duration-200 hover:text-white"
               aria-label="Close lightbox"
             >
               <span className="hidden sm:inline">Close</span>
@@ -175,7 +173,7 @@ export default function Lightbox({
                 type="button"
                 onClick={onPrev}
                 aria-label="Previous image"
-                className="absolute left-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-black/50 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:left-6"
+                className="absolute left-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-[var(--ink)]/70 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:left-6"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -219,7 +217,7 @@ export default function Lightbox({
                 type="button"
                 onClick={onNext}
                 aria-label="Next image"
-                className="absolute right-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-black/50 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:right-6"
+                className="absolute right-3 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/15 bg-[var(--ink)]/70 text-white/80 transition-colors duration-200 hover:border-white hover:text-white sm:right-6"
               >
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -241,7 +239,7 @@ export default function Lightbox({
                       aria-current={isCurrent ? "true" : undefined}
                       className={`relative h-14 w-11 shrink-0 overflow-hidden border transition-all duration-200 ${
                         isCurrent
-                          ? "border-[#F04759] opacity-100 ring-1 ring-[#F04759]"
+                          ? "border-[var(--accent)] opacity-100"
                           : "border-white/15 opacity-50 hover:opacity-85"
                       }`}
                     >

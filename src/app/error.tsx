@@ -23,20 +23,19 @@ export default function Error({
 
   return (
     <main className="flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
-      <p className="eyebrow text-[var(--accent-primary)]">Something went wrong</p>
-      <h1 className="display-title mt-4 text-[var(--text-primary)]">
+      <h1 className="type-title">
         This page could not be displayed
       </h1>
       <p className="prose-editorial mt-4 text-[var(--text-secondary)]">
         The portfolio is temporarily unavailable. Reloading usually fixes it.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <button type="button" onClick={reset} className="cinematic-button">
+        <button type="button" onClick={reset} className="button-solid">
           Try again
         </button>
         <Link
           href="/"
-          className="link-underline px-2 py-3 text-[length:var(--step--1)] uppercase tracking-[0.28em] text-[var(--text-secondary)]"
+          className="button-quiet px-2"
         >
           Back to home
         </Link>

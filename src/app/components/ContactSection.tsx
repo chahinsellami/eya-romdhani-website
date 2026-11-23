@@ -1,22 +1,55 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowUpRight, Check, Copy } from "lucide-react";
-import Reveal from "./Reveal";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { portfolio } from "../../data/portfolio";
 import ContactForm from "./ContactForm";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const INQUIRY_TYPES = [
-  "Runway Booking",
-  "Editorial Shoot",
-  "Brand Campaign",
-  "Commercial & Beauty",
+  "Runway booking",
+  "Editorial shoot",
+  "Brand campaign",
+  "Commercial and beauty",
+];
+
+/* The mosaic strip: crops edge to edge, different widths, like a contact sheet */
+const STRIP = [
+  { src: "/images/portfolio/flash-choker.webp", width: "w-[34%]", position: "50% 38%", alt: "Low-angle flash portrait in a black choker" },
+  { src: "/images/portfolio/tile-closeup.webp", width: "w-[16%]", position: "50% 30%", alt: "Colour close-up, hands in her hair" },
+  { src: "/images/portfolio/flash-shoulder.webp", width: "w-[20%]", position: "45% 40%", alt: "Flash portrait looking back over a bare shoulder" },
+  { src: "/images/portfolio/tile-turtleneck-back.webp", width: "w-[12%]", position: "50% 30%", alt: "Black and white portrait in a turtleneck, looking back" },
+  { src: "/images/portfolio/tile-hands.webp", width: "w-[18%]", position: "50% 35%", alt: "Colour close-up with a hand raised beside her face" },
 ];
 
 export default function ContactSection() {
   const { contact, social, origin } = portfolio;
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [copied, setCopied] = useState(false);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+
+  // The headline opens out of tight tracking as it scrolls in
+  useEffect(() => {
+    const el = headlineRef.current;
+    if (!el) return;
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo(
+        el,
+        { letterSpacing: "0.12em", opacity: 0.2 },
+        {
+          letterSpacing: "-0.03em",
+          opacity: 1,
+          ease: "none",
+          scrollTrigger: { trigger: el, start: "top 95%", end: "top 45%", scrub: true },
+        },
+      );
+    });
+    return () => mm.revert();
+  }, []);
 
   const handleCopyEmail = async () => {
     try {
@@ -28,141 +61,130 @@ export default function ContactSection() {
     }
   };
 
+  const instagramHandle = social.instagram
+    ? `@${social.instagram.replace(/\/+$/, "").split("/").pop()}`
+    : "";
+
   return (
-    <div>
-      <Reveal
-        y={20}
-        duration={0.55}
-        className="mb-12 border-b border-[var(--border-subtle)] pb-8"
-      >
-        <p className="eyebrow mb-3 !text-[var(--accent-primary)]">04. Inquiries</p>
-        <h2 id="contact-heading" className="display-title text-[var(--text-primary)]">
-          Direct Booking &amp;{" "}
-          <span className="italic font-light">Commissions</span>
+    <div className="overflow-hidden">
+      <div className="relative">
+        <p className="type-label absolute bottom-5 left-[var(--space-gutter)] z-10 flex items-center gap-3 !text-[var(--bone)]">
+          05 <span aria-hidden="true" className="inline-block h-px w-8 bg-current" /> Booking
+        </p>
+        <div className="flex h-[34svh] gap-px lg:h-[56svh]">
+          {STRIP.map((print) => (
+            <div key={print.src} data-gl className={`relative h-full ${print.width}`}>
+              <Image
+                src={print.src}
+                alt={print.alt}
+                fill
+                sizes="34vw"
+                style={{ objectPosition: print.position }}
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="section-shell !pt-16">
+        <h2
+          id="contact-heading"
+          ref={headlineRef}
+          className="type-serif whitespace-nowrap text-[clamp(4.5rem,17vw,18rem)] leading-[0.85]"
+        >
+          Book Aya
         </h2>
-      </Reveal>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* Left column: Direct coordinates + quick inquiry presets */}
-        <Reveal y={22} delay={0.05} duration={0.58} className="space-y-8 lg:col-span-5">
-          <p className="prose-editorial text-sm leading-relaxed text-[var(--text-secondary)] md:text-base">
-            Available for runway, editorial, campaign, and beauty commissions
-            locally and internationally. Direct inquiries are answered promptly.
-          </p>
+        <div className="mt-16 grid grid-cols-1 gap-16 border-t border-[var(--border-subtle)] pt-12 lg:grid-cols-12 lg:gap-[clamp(3rem,5vw,6rem)]">
+          <div className="lg:col-span-5">
+            <p className="max-w-[40ch] text-[var(--text-secondary)]">
+              Available for runway, editorial, campaign and beauty work in{" "}
+              {origin ?? "Tunisia"} and abroad. Send dates, location and usage, and Aya will
+              reply to you directly.
+            </p>
 
-          <dl className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
-            <div className="flex flex-wrap items-center justify-between gap-3 py-4">
-              <dt className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
-                Direct Email
-              </dt>
-              <dd className="flex min-w-0 flex-wrap items-center gap-3">
-                <a
-                  href={`mailto:${contact.management}`}
-                  className="link-underline break-all text-sm font-medium text-[var(--text-primary)] sm:break-normal"
-                >
-                  {contact.management}
-                </a>
-                <button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  aria-label="Copy email address"
-                  className="inline-flex min-h-[40px] items-center gap-1.5 border border-[var(--border-subtle)] px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--text-primary)] hover:text-[var(--text-primary)] sm:min-h-0 sm:h-8 sm:px-2.5"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-3 w-3 text-[var(--accent-primary)]" aria-hidden="true" />
-                      <span>Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" aria-hidden="true" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-              </dd>
+            <div className="mt-12">
+              <p className="type-label">Email</p>
+              <a
+                href={`mailto:${contact.management}`}
+                className="link-underline type-serif mt-3 block break-all text-[clamp(1.75rem,1.1rem+2.2vw,3.25rem)] leading-tight"
+              >
+                {contact.management}
+              </a>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className="mt-3 min-h-[44px] text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              >
+                <span aria-live="polite">{copied ? "Email copied" : "Copy email"}</span>
+              </button>
             </div>
 
-            <div className="flex items-baseline justify-between gap-3 py-4">
-              <dt className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
-                Location
-              </dt>
-              <dd className="text-sm text-[var(--text-primary)]">
-                {origin ?? "Sousse, Tunisia"} · Travel ready
-              </dd>
-            </div>
-
-            {social.instagram && (
-              <div className="flex items-baseline justify-between gap-3 py-4">
-                <dt className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
-                  Instagram
-                </dt>
-                <dd>
-                  <a
-                    href={social.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-primary)] transition-colors duration-200 hover:text-[var(--accent-primary)]"
-                  >
-                    <span>@aya__romdhani21</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </a>
-                </dd>
+            <dl className="mt-10 grid grid-cols-1 gap-6 border-t border-[var(--border-subtle)] pt-6 sm:grid-cols-2">
+              {social.instagram && (
+                <div>
+                  <dt className="type-label">Instagram</dt>
+                  <dd className="mt-1">
+                    <a
+                      href={social.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link-underline text-[0.875rem] tracking-[0.06em]"
+                    >
+                      {instagramHandle}
+                    </a>
+                  </dd>
+                </div>
+              )}
+              <div>
+                <dt className="type-label">Based in</dt>
+                <dd className="mt-1 text-[0.875rem]">{origin ?? "Sousse, Tunisia"}, travels for work</dd>
               </div>
-            )}
+              {contact.agencyName && (
+                <div>
+                  <dt className="type-label">Agency</dt>
+                  <dd className="mt-1 text-[0.875rem]">
+                    {contact.agencyName}
+                    {contact.agencyAddress && (
+                      <span className="block text-[var(--text-tertiary)]">{contact.agencyAddress}</span>
+                    )}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
 
-            {contact.agencyName && (
-              <div className="flex items-baseline justify-between gap-3 py-4">
-                <dt className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
-                  Agency
-                </dt>
-                <dd className="text-right text-sm text-[var(--text-primary)]">
-                  <span>{contact.agencyName}</span>
-                  {contact.agencyAddress && (
-                    <span className="block text-xs text-[var(--text-tertiary)]">
-                      {contact.agencyAddress}
-                    </span>
-                  )}
-                </dd>
+          <div className="lg:col-span-7">
+            <fieldset>
+              <legend className="type-label mb-4">What is the booking for?</legend>
+              <div className="flex flex-wrap gap-2">
+                {INQUIRY_TYPES.map((type) => {
+                  const isSelected = selectedSubject === type;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setSelectedSubject(type)}
+                      aria-pressed={isSelected}
+                      className={`min-h-[44px] cursor-pointer border px-4 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 whitespace-nowrap ${
+                        isSelected
+                          ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
+                          : "border-[var(--border-strong)] hover:border-[var(--text-primary)]"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  );
+                })}
               </div>
-            )}
-          </dl>
+            </fieldset>
 
-          {/* Interactive quick-select booking type */}
-          <div>
-            <p className="eyebrow mb-3">Quick Inquiry Subject</p>
-            <div className="flex flex-wrap gap-2">
-              {INQUIRY_TYPES.map((type) => {
-                const isSelected = selectedSubject === type;
-                return (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setSelectedSubject(type)}
-                    aria-pressed={isSelected}
-                    className={`border px-3.5 py-2 text-xs font-medium transition-colors duration-200 whitespace-nowrap shrink-0 ${
-                      isSelected
-                        ? "border-[var(--accent-primary)] bg-[var(--accent-primary)] text-white"
-                        : "border-[var(--border-subtle)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)]"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                );
-              })}
+            <div className="mt-10 border border-[var(--border-subtle)] p-6 sm:p-10">
+              <ContactForm selectedSubject={selectedSubject} />
             </div>
           </div>
-        </Reveal>
-
-        {/* Right column: Booking form */}
-        <Reveal
-          y={24}
-          delay={0.12}
-          duration={0.62}
-          className="border border-[var(--border-subtle)] bg-[var(--bg-secondary)]/45 p-6 sm:p-8 lg:col-span-7"
-        >
-          <ContactForm selectedSubject={selectedSubject} />
-        </Reveal>
+        </div>
       </div>
     </div>
   );

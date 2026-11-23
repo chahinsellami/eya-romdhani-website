@@ -3,15 +3,12 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
-      <p className="eyebrow !text-[var(--accent-primary)]">404 · Page Not Found</p>
-      <h1 className="display-title mt-4 text-[var(--text-primary)]">
-        This study could not be found
-      </h1>
-      <p className="prose-editorial mt-4 text-sm text-[var(--text-secondary)]">
-        The requested page is unavailable or has moved. Return to the main portfolio.
+      <h1 className="type-title">There&rsquo;s no page here</h1>
+      <p className="prose-editorial mt-4">
+        The link may be old or mistyped. The portfolio is on the home page.
       </p>
-      <Link href="/" className="cinematic-button mt-8">
-        Return to Portfolio
+      <Link href="/" className="button-solid mt-8">
+        Go to the portfolio
       </Link>
     </main>
   );

@@ -16,10 +16,8 @@ export function preferredScrollBehavior(): ScrollBehavior {
 export function scrollToSectionById(id: string): void {
   if (typeof document === "undefined") return;
   const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({
-      behavior: preferredScrollBehavior(),
-      block: "start",
-    });
-  }
+  if (!element) return;
+  // Lenis owns scrolling when it is running; a native smooth scroll would fight it
+  if (window.__lenis) window.__lenis.scrollTo(element, { duration: 1.6 });
+  else element.scrollIntoView({ behavior: preferredScrollBehavior(), block: "start" });
 }

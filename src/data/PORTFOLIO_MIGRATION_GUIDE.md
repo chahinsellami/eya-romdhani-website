@@ -9,7 +9,7 @@ This guide documents how to migrate from legacy data structures to the new schem
 import { validatePortfolio, safeParsePortfolio } from "./portfolio";
 
 const legacyData = {
-  name: "Evelyn Rose",
+  name: "Aya Romdhani",
   // ... your legacy data
 };
 
@@ -188,7 +188,7 @@ import { PortfolioSchema, type Lookbook, type PortfolioItem } from "./portfolio"
 import crypto from "crypto";
 
 const DEFAULT_PORTFOLIO: any = {
-  name: "Evelyn Rose",
+  name: "Aya Romdhani",
   // ... default values
 };
 
@@ -310,7 +310,7 @@ export default function AboutSection({ data }: AboutSectionProps) {
 import { validatePortfolio } from "./portfolio";
 
 const DEFAULT_PORTFOLIO = {
-  name: "Evelyn Rose",
+  name: "Aya Romdhani",
   // ... defaults
 };
 

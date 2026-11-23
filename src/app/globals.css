@@ -4,59 +4,54 @@
 
 :root {
   /*
-    3-Color Editorial System:
-    Main 1 (Canvas 60%): Alabaster (#F7F7F5) & Pale Stone (#EEEEEA)
-    Main 2 (Structure 30%): Jet Obsidian (#0C0C0E) & Charcoal Surface (#151518)
-    Breaker (Accent 10%): Couture Crimson (#C81E32 on light / #F04759 on obsidian)
+    Palette: noir. Warm black and bone, like silver prints in a dark gallery.
+    No colour accent: the photographs carry all the colour on the page.
   */
-  --alabaster: #F7F7F5;
-  --alabaster-deep: #EEEEEA;
-  --alabaster-dimmer: #E2E2DC;
-  --obsidian: #0C0C0E;
-  --obsidian-surface: #151518;
-  --crimson: #C81E32;
-  --crimson-lit: #F04759;
+  --ink: #0B0A09;
+  --ink-raised: #161412; /* inputs and panels on ink */
+  --bone: #E8E2D9;
+  --bone-raised: #F2EEE8;
+  --ash: #9A948B; /* secondary text on ink: 6.6:1 */
+  --stone: #5E5A54; /* secondary text on bone: 5.3:1 */
+  --accent: var(--bone); /* interactive marks on ink */
+  --accent-on-light: var(--ink);
+  --on-accent: var(--ink);
 
-  --bg-primary: var(--alabaster);
-  --bg-secondary: var(--alabaster-deep);
-  --bg-tertiary: var(--alabaster-dimmer);
-  --ink-bg: var(--obsidian);
-  --ink-surface: var(--obsidian-surface);
+  /* Light surface tokens (bone rooms) */
+  --bg-primary: var(--bone);
+  --bg-secondary: var(--bone-raised);
+  --text-primary: var(--ink);
+  --text-secondary: #3A3733;
+  --text-tertiary: var(--stone);
+  --link: var(--ink);
+  --border-subtle: rgba(11, 10, 9, 0.16);
+  --border-strong: rgba(11, 10, 9, 0.45);
 
-  --text-primary: var(--obsidian); /* 18.5:1 on --bg-primary */
-  --text-secondary: #45454A; /* 8.9:1 */
-  --text-tertiary: #636369; /* 5.6:1 */
+  /* Dark surface values */
+  --ink-bg: var(--ink);
+  --on-ink: var(--bone);
+  --on-ink-secondary: var(--ash);
+  --border-on-ink: rgba(232, 226, 217, 0.16);
 
-  --on-ink: var(--alabaster);
-  --on-ink-secondary: #B8B8BE;
-  --on-ink-tertiary: #8E8E96;
+  --danger-text: #A3161A;
+  --danger-border: rgba(163, 22, 26, 0.55);
+  --danger-bg: rgba(163, 22, 26, 0.06);
 
-  --accent-primary: var(--crimson); /* 5.2:1 on --bg-primary */
-  --accent-on-ink: var(--crimson-lit); /* 5.3:1 on --ink-bg */
-  --accent-glow: rgba(200, 30, 50, 0.14);
+  --font-sans: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), "Cormorant", Georgia, serif;
 
-  --danger-text: #9B1C1C;
-  --danger-border: rgba(155, 28, 28, 0.55);
-  --danger-bg: rgba(155, 28, 28, 0.07);
-  --border-subtle: rgba(12, 12, 14, 0.12);
-  --border-strong: rgba(12, 12, 14, 0.28);
-  --border-on-ink: rgba(247, 247, 245, 0.14);
+  /* Scale on a 1.333 ratio from a 17px base */
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.4167rem;
+  --step-2: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+  --step-3: clamp(3rem, 1.8rem + 4.8vw, 6.5rem);
+  --step-name: clamp(5.6rem, 15vw, 17rem); /* ROMDHANI ends on the light wall of the photo */
 
-  --nav-height: 4.5rem;
-
-  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
-  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
-
-  --step--1: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
-  --step-0: clamp(0.9375rem, 0.92rem + 0.15vw, 1.03125rem);
-  --step-3: clamp(2rem, 1.4rem + 2.8vw, 3.35rem);
-  --step-4: clamp(2.85rem, 1.9rem + 5.2vw, 6rem);
-
-  --space-section: clamp(4.5rem, 3rem + 5vw, 7.5rem);
-  --space-gutter: clamp(1.25rem, 0.8rem + 2vw, 3rem);
-  --content-max: 82rem;
-  --measure: 62ch;
+  --space-section: clamp(5rem, 3rem + 7vw, 10rem);
+  --space-gutter: clamp(1.25rem, 0.6rem + 2.4vw, 3rem);
+  --content-max: 90rem;
+  --measure: 60ch;
 
   --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-base: 200ms;
@@ -64,27 +59,49 @@
   color-scheme: light;
 }
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 4.5rem;
-  -webkit-text-size-adjust: 100%;
+/* Flip the semantic tokens so any component renders correctly on ink */
+.surface-ink {
+  --bg-primary: var(--ink);
+  --bg-secondary: var(--ink-raised);
+  --text-primary: var(--bone);
+  --text-secondary: var(--ash);
+  --text-tertiary: var(--ash);
+  --link: var(--bone);
+  --border-subtle: var(--border-on-ink);
+  --border-strong: rgba(232, 226, 217, 0.42);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-@media (min-width: 768px) {
-  html {
-    scroll-padding-top: 5.5rem;
-  }
+/* Back to the light tokens for a bone room inside the ink page */
+.surface-bone {
+  --bg-primary: var(--bone);
+  --bg-secondary: var(--bone-raised);
+  --text-primary: var(--ink);
+  --text-secondary: #3A3733;
+  --text-tertiary: var(--stone);
+  --link: var(--ink);
+  --border-subtle: rgba(11, 10, 9, 0.16);
+  --border-strong: rgba(11, 10, 9, 0.45);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+html {
+  scroll-behavior: auto; /* Lenis does the smoothing */
+  scroll-padding-top: 4rem;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   color: var(--text-primary);
   background: var(--bg-primary);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: var(--step-0);
-  line-height: 1.65;
+  font-stretch: 100%;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -98,11 +115,6 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-
-  .reveal-block {
-    opacity: 1 !important;
-    transform: none !important;
   }
 }
 
@@ -124,96 +136,120 @@ body {
   }
 }
 
-/* Editorial type primitives */
-.display-hero {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: var(--step-4);
-  line-height: 0.92;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-.display-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--step-3);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-
-.eyebrow {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-}
-
-.prose-editorial {
-  max-width: var(--measure);
-  color: var(--text-secondary);
-}
-
-@keyframes editorial-marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-.animate-editorial-marquee {
-  animation: editorial-marquee 38s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-editorial-marquee {
-    animation: none;
-  }
-}
-
 @layer base {
   * {
     border-color: var(--border-subtle);
   }
 
   *:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
   }
 }
 
 @layer components {
-  .cinematic-button {
-    @apply inline-flex items-center justify-center gap-2 border px-6 py-3 text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0;
+  /*
+    Type. One family, Archivo, used across its width axis: the name and the
+    numbers run extra-condensed and tall, the reading text at normal width.
+  */
+  .type-name {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: var(--step-name);
+    line-height: 0.82;
+    letter-spacing: -0.03em;
+  }
+
+  .type-title {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: var(--step-3);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .type-figure {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .type-lede {
+    font-size: var(--step-1);
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+  }
+
+  .type-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  /* Bodoni at display optical size: statements, chapter titles, the "Aya" of the name */
+  .type-serif {
+    font-family: var(--font-serif);
+    font-style: normal;
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    line-height: 0.92;
+  }
+
+  /* Outlined display type, used where the name sits in front of a photograph */
+  .type-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--bone);
+  }
+
+  .prose-editorial {
+    max-width: var(--measure);
+    color: var(--text-secondary);
+  }
+
+  /* Tracked caps with a dot, outlined in a hairline: "BOOK AYA  ●" */
+  .button-solid {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-3 border px-7 whitespace-nowrap shrink-0;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
     border-color: var(--text-primary);
+    background-color: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 300ms, color 300ms;
+  }
+
+  .button-solid::after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  .button-solid:hover {
     background-color: var(--text-primary);
     color: var(--bg-primary);
   }
 
-  .cinematic-button:hover,
-  .cinematic-button:focus-visible {
-    border-color: var(--accent-primary);
-    background-color: var(--accent-primary);
-    color: #FFFFFF;
+  .button-quiet {
+    @apply inline-flex min-h-[48px] items-center gap-2 text-[0.9375rem] font-semibold whitespace-nowrap shrink-0;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+    transition: text-underline-offset var(--duration-base) var(--ease-editorial);
   }
 
-  .cinematic-button-outline {
-    @apply inline-flex items-center justify-center gap-2 border px-6 py-3 text-xs font-medium uppercase tracking-[0.16em] transition-colors duration-200 whitespace-nowrap shrink-0;
-    border-color: var(--border-strong);
-    background-color: transparent;
-    color: var(--text-primary);
-  }
-
-  .cinematic-button-outline:hover,
-  .cinematic-button-outline:focus-visible {
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
-    background-color: var(--bg-secondary);
+  .button-quiet:hover {
+    text-underline-offset: 0.2em;
   }
 
   .shell {
@@ -238,194 +274,41 @@ body {
   }
 
   .link-underline {
-    position: relative;
-    display: inline-block;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color var(--duration-base);
   }
 
-  .link-underline::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    height: 1px;
-    width: 100%;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--duration-base) var(--ease-editorial);
-  }
-
-  .link-underline:hover::after,
-  .link-underline:focus-visible::after {
-    transform: scaleX(1);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .link-underline::after {
-      transition: none;
-      transform: scaleX(1);
-    }
-  }
-
-  .scroll-slim {
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-primary) transparent;
-  }
-
-  .scroll-slim::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .scroll-slim::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scroll-slim::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--accent-primary) 55%, transparent);
-    border-radius: 999px;
-  }
-
-  .scroll-slim::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-primary);
+  .link-underline:hover {
+    text-decoration-color: currentColor;
   }
 }
 
-/* Bespoke 3-color editorial custom cursor (fine mouse pointers only) */
-@media (hover: hover) and (pointer: fine) {
-  html.has-custom-cursor,
-  html.has-custom-cursor * {
-    cursor: none !important;
-  }
-
-  html.has-custom-cursor input,
-  html.has-custom-cursor textarea,
-  html.has-custom-cursor select,
-  html.has-custom-cursor [contenteditable="true"] {
-    cursor: text !important;
+/* Slow turn for the hero star badge's text ring; stopped by the reduced-motion rule above */
+@keyframes badge-turn {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-.editorial-cursor {
-  opacity: 0;
-  transition: opacity 150ms var(--ease-editorial);
+.badge-turn {
+  animation: badge-turn 24s linear infinite;
 }
 
-.editorial-cursor[data-visible="true"] {
-  opacity: 1;
-}
-
-.editorial-cursor[data-mode="hidden"] {
+/* WebGL has redrawn this photo on the canvas: hide the DOM copy, keep it for layout and alt text */
+[data-gl-ready] img {
   opacity: 0;
 }
 
-.editorial-cursor-anchor {
+/* Film grain over the whole experience. Static noise: no animation cost. */
+.grain {
   position: fixed;
-  left: 0;
-  top: 0;
-  will-change: transform;
-}
-
-.editorial-cursor-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background-color: var(--crimson);
-  transform: translate(-50%, -50%) scale(1);
-  transition:
-    transform 150ms var(--ease-editorial),
-    opacity 150ms var(--ease-editorial),
-    background-color 150ms var(--ease-editorial);
-}
-
-.editorial-cursor-ring {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9999px;
-  border: 1px solid rgba(12, 12, 14, 0.45);
-  background-color: transparent;
-  transform: translate(-50%, -50%) scale(1);
-  transition:
-    width 200ms var(--ease-editorial),
-    height 200ms var(--ease-editorial),
-    transform 180ms var(--ease-editorial),
-    border-color 180ms var(--ease-editorial),
-    background-color 180ms var(--ease-editorial),
-    color 180ms var(--ease-editorial);
-}
-
-.editorial-cursor-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 140ms var(--ease-editorial);
-}
-
-/* Dark Obsidian surface adaptation */
-.editorial-cursor[data-surface="dark"] .editorial-cursor-dot {
-  background-color: var(--crimson-lit);
-}
-
-.editorial-cursor[data-surface="dark"] .editorial-cursor-ring {
-  border-color: rgba(247, 247, 245, 0.52);
-}
-
-/* Interactive links & buttons */
-.editorial-cursor[data-mode="interactive"] .editorial-cursor-dot {
-  transform: translate(-50%, -50%) scale(0.75);
-}
-
-.editorial-cursor[data-mode="interactive"] .editorial-cursor-ring {
-  width: 48px;
-  height: 48px;
-  border-color: var(--crimson);
-  background-color: rgba(200, 30, 50, 0.06);
-}
-
-.editorial-cursor[data-surface="dark"][data-mode="interactive"] .editorial-cursor-ring {
-  border-color: var(--crimson-lit);
-  background-color: rgba(240, 71, 89, 0.12);
-}
-
-/* Editorial photographic inspection lens ("VIEW" / "NEXT") */
-.editorial-cursor[data-mode="view"] .editorial-cursor-dot,
-.editorial-cursor[data-mode="next"] .editorial-cursor-dot {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.2);
-}
-
-.editorial-cursor[data-mode="view"] .editorial-cursor-ring,
-.editorial-cursor[data-mode="next"] .editorial-cursor-ring {
-  width: 60px;
-  height: 60px;
-  border-color: var(--crimson);
-  background-color: var(--obsidian);
-  color: var(--alabaster);
-}
-
-.editorial-cursor[data-surface="dark"][data-mode="view"] .editorial-cursor-ring,
-.editorial-cursor[data-surface="dark"][data-mode="next"] .editorial-cursor-ring {
-  border-color: var(--crimson-lit);
-  background-color: var(--alabaster);
-  color: var(--obsidian);
-}
-
-.editorial-cursor[data-mode="view"] .editorial-cursor-label,
-.editorial-cursor[data-mode="next"] .editorial-cursor-label {
-  opacity: 1;
-}
-
-/* Click compression */
-.editorial-cursor[data-pressed="true"] .editorial-cursor-ring {
-  transform: translate(-50%, -50%) scale(0.84);
-}
-
-.editorial-cursor[data-pressed="true"] .editorial-cursor-dot {
-  transform: translate(-50%, -50%) scale(1.4);
+  inset: -50%;
+  z-index: 35;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }

@@ -3,76 +3,38 @@ import localFont from "next/font/local";
 import { MotionConfig } from "motion/react";
 import "./globals.css";
 import StructuredData from "./components/StructuredData";
-import CustomCursor from "./components/CustomCursor";
+import WebGLStage from "./components/experience/WebGLStage";
+import SmoothScroll from "./components/experience/SmoothScroll";
 
+// Archivo across its width axis (62–125%): condensed for the name, normal for reading.
+const archivo = localFont({
+  src: [
+    {
+      path: "../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
+  declarations: [{ prop: "font-stretch", value: "62% 125%" }],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+// Cormorant at its lightest: the thin, high-contrast display serif of the site.
 const cormorant = localFont({
   src: [
     {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-300-normal.woff2",
-      weight: "300",
+      path: "../../node_modules/@fontsource-variable/cormorant/files/cormorant-latin-wght-normal.woff2",
+      weight: "300 700",
       style: "normal",
     },
     {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-300-italic.woff2",
-      weight: "300",
+      path: "../../node_modules/@fontsource-variable/cormorant/files/cormorant-latin-wght-italic.woff2",
+      weight: "300 700",
       style: "italic",
-    },
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-italic.woff2",
-      weight: "400",
-      style: "italic",
-    },
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff2",
-      weight: "500",
-      style: "normal",
     },
   ],
   variable: "--font-cormorant",
-  display: "swap",
-});
-
-const jakarta = localFont({
-  src: [
-    {
-      path: "../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-400-normal.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-500-normal.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-600-normal.woff2",
-      weight: "600",
-      style: "normal",
-    },
-  ],
-  variable: "--font-jakarta",
-  display: "swap",
-});
-
-const jetbrainsMono = localFont({
-  src: [
-    {
-      path: "../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2",
-      weight: "500",
-      style: "normal",
-    },
-  ],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -138,7 +100,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#F7F7F5",
+  themeColor: "#0B0A09",
   colorScheme: "light",
 };
 
@@ -150,24 +112,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${jakarta.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${archivo.variable} ${cormorant.variable} antialiased`}
     >
-      <head>
-        <noscript>
-          <style>{`.reveal-block{opacity:1!important;transform:none!important}`}</style>
-        </noscript>
-      </head>
-      <body className="bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased selection:bg-[var(--accent-primary)] selection:text-white">
+      <body className="bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased selection:bg-[var(--accent)] selection:text-[var(--on-accent)]">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-[var(--accent-primary)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[var(--on-accent)]"
         >
           Skip to content
         </a>
         <StructuredData />
         <MotionConfig reducedMotion="user">
-          <CustomCursor />
+          <SmoothScroll />
           {children}
+          <WebGLStage />
+          <div className="grain" aria-hidden="true" />
         </MotionConfig>
       </body>
     </html>

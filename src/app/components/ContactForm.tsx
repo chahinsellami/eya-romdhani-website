@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { z } from "zod";
-import { ArrowUpRight } from "lucide-react";
 import { portfolio } from "../../data/portfolio";
 
 const CONTACT_SCHEMA = z.object({
@@ -45,16 +44,16 @@ const FIELD_LABELS: Record<FieldName, string> = {
   name: "Name",
   email: "Email",
   subject: "Subject",
-  message: "Project Brief",
+  message: "Project brief",
 };
 
 const inputClasses =
-  "w-full border bg-[var(--bg-primary)] px-4 py-3 text-base text-[var(--text-primary)] sm:text-sm " +
+  "w-full border-0 border-b border-[var(--border-strong)] bg-transparent px-0 py-3 text-base text-[var(--text-primary)] " +
   "transition-colors duration-200 placeholder:text-[var(--text-tertiary)] " +
-  "focus:border-[var(--text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]";
+  "focus:border-[var(--accent)] focus:outline-none focus-visible:shadow-[0_1px_0_0_var(--accent)]";
 
 const labelClasses =
-  "block text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]";
+  "block text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-[var(--text-tertiary)]";
 
 function buildMailtoUrl(values: ContactValues): string {
   const body = [
@@ -253,7 +252,7 @@ export default function ContactForm({ selectedSubject }: ContactFormProps) {
           value={values.subject}
           onChange={handleChange}
           required
-          placeholder="e.g. Editorial Shoot — Paris / Sousse"
+          placeholder="For example, editorial shoot in Sousse"
           aria-invalid={errors.subject ? true : undefined}
           aria-describedby={errors.subject ? errorIdFor("subject") : undefined}
           className={`${inputClasses} ${
@@ -284,7 +283,7 @@ export default function ContactForm({ selectedSubject }: ContactFormProps) {
           required
           rows={5}
           maxLength={1500}
-          placeholder="Share shoot dates, location, usage, and creative direction..."
+          placeholder="Dates, location, usage and creative direction"
           aria-invalid={errors.message ? true : undefined}
           aria-describedby={errors.message ? errorIdFor("message") : undefined}
           className={`${inputClasses} resize-y ${
@@ -301,12 +300,11 @@ export default function ContactForm({ selectedSubject }: ContactFormProps) {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button type="submit" className="cinematic-button">
-          <span>Prepare Booking Email</span>
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+        <button type="submit" className="button-solid">
+          Write booking email
         </button>
         <p className="text-xs text-[var(--text-tertiary)]">
-          Opens your mail client addressed to {portfolio.contact.management}
+          Opens your email app, addressed to {portfolio.contact.management}
         </p>
       </div>
 
@@ -316,7 +314,7 @@ export default function ContactForm({ selectedSubject }: ContactFormProps) {
             ref={successRef}
             tabIndex={-1}
             role="status"
-            className="border border-[var(--border-subtle)] bg-[var(--bg-secondary)] px-4 py-3 text-xs text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            className="border border-[var(--border-subtle)] bg-[var(--bg-secondary)] px-4 py-3 text-xs text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             Your mail app should now be open with the draft ready to send. If
             nothing opened, write directly to {portfolio.contact.management}.

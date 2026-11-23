@@ -21,11 +21,7 @@ const config: Config = {
         "accent-faint": "var(--accent-glow)",
       },
       fontFamily: {
-        display: ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
-        body: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
-        serif: ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
-        sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace", "monospace"],
+        sans: ["var(--font-archivo)", "Archivo", "system-ui", "sans-serif"],
       },
     },
   },

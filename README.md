@@ -1,22 +1,31 @@
 # Aya Romdhani — Runway & Editorial Model
 
 Portfolio site for runway and editorial model Aya Romdhani (Sousse, Tunisia),
-built with Next.js (App Router), TypeScript, Tailwind CSS and React Three Fiber.
+built with Next.js (App Router), TypeScript, Tailwind CSS, three.js and GSAP.
 
-## Colour
+## Design
 
-Gallery white (`#FAF8F4`) is the dominant ground: the page, navigation, filter
-bar and every card sit on it. Charcoal (`#1A1A1A`) carries the body type and the
-hero's photographic scrim, and terracotta (`#B4532A`) is the single accent, used
-only for links, focus rings, buttons and small uppercase labels. All tokens are
-declared once in `src/app/globals.css` and consumed through the semantic
-variables, so no component hardcodes a colour.
+Noir, after two reference sites the owner chose: a dark page of full-bleed
+photographic bands with one bone band (About), huge thin serif, tiny tracked
+capital labels with an index (01 Home to 05 Booking), hairline rules.
 
-The charcoal scheme is **opt-in**, not automatic: it lives in
-`[data-theme="dark"]` on `<html>`. The white ground is the design, so tying it to
-`prefers-color-scheme` would flip the entire page for any visitor whose OS is set
-to dark. `:root` declares `color-scheme: light` so native scrollbars and form
-controls match the white ground.
+- **Colour** (tokens in `src/app/globals.css`): ink `#0B0A09`, bone `#E8E2D9`,
+  ash `#9A948B` for secondary text. No colour accent: the photographs carry the
+  colour. `.surface-ink` / `.surface-bone` flip the semantic tokens per band.
+  A static film-grain overlay sits over everything.
+- **Type**: Cormorant at weight 300 for all display type (name, titles,
+  figures, "PRESENCE"); Archivo for body text and the tracked caps labels.
+- **WebGL** (`components/experience/WebGLStage.tsx`): one fixed three.js canvas
+  redraws every element marked `data-gl` as a shader plane that matches its box.
+  Prints develop in on first view and bend slightly with scroll speed; there
+  is deliberately no hover zoom. `data-gl-depth` adds mouse parallax. At rest the photo is untouched.
+  Without WebGL, or with reduced motion, the canvas is never created and the
+  plain `<img>` stays.
+- **Motion**: Lenis smooth scrolling drives GSAP ScrollTrigger
+  (`experience/SmoothScroll.tsx`). The work is an editorial index: the four series listed in huge
+  thin serif; pointing at or focusing one crossfades its prints onto the stage
+  (WebGLStage follows each print's inline opacity). Phones list each series
+  with its prints.
 
 ## Setup
 
@@ -41,8 +50,9 @@ production build in `.next/`.
 - React 19
 - TypeScript (strict)
 - Tailwind CSS 3 (colour values come from CSS custom properties in `globals.css`)
-- Framer Motion
-- React Three Fiber + Drei
+- motion (menu, lightbox)
+- three.js (WebGL photo planes)
+- GSAP + ScrollTrigger, Lenis
 - Zod (content schema + contact-form validation)
 
 ## Structure

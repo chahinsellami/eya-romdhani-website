@@ -109,7 +109,7 @@ const page = evaluate(`JSON.stringify({
   horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
 })`);
 
-check("Headline renders", page.heading === "Evelyn Rose", `h1="${page.heading}"`);
+check("Headline renders", (page.heading ?? "").startsWith("Aya Romdhani"), `h1="${page.heading}"`);
 check("Headline is visible", page.headingOpacity === "1", `opacity=${page.headingOpacity}`);
 check("Dark theme applied", page.bodyBg === "rgb(8, 8, 8)", page.bodyBg);
 check("Gallery renders 6 items", page.articles === 6, `articles=${page.articles}`);
