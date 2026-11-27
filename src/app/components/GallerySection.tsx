@@ -18,6 +18,7 @@ interface FrameSpec {
 interface SeriesSpec {
   name: string;
   note: string;
+  tall?: boolean; // portrait prints: the lead print stays upright on phones
   frames: FrameSpec[];
 }
 
@@ -29,9 +30,26 @@ const ID = {
   shearling: "ebcd7890-1234-5678-90ab-cdef0123456f",
   choker: "ebcd7890-1234-5678-90ab-cdef01234570",
   shoulder: "ebcd7890-1234-5678-90ab-cdef01234571",
+  digitalFront: "ebcd7890-1234-5678-90ab-cdef01234572",
+  digitalProfile: "ebcd7890-1234-5678-90ab-cdef01234573",
+  digitalArms: "ebcd7890-1234-5678-90ab-cdef01234574",
+  digitalClose: "ebcd7890-1234-5678-90ab-cdef01234575",
+  digitalSide: "ebcd7890-1234-5678-90ab-cdef01234576",
 };
 
 const SERIES: SeriesSpec[] = [
+  {
+    name: "Digitals",
+    note: "A plain wall and a black turtleneck: the simple, straight-on shots casting directors ask for.",
+    tall: true,
+    frames: [
+      { itemId: ID.digitalFront },
+      { itemId: ID.digitalProfile },
+      { itemId: ID.digitalArms },
+      { itemId: ID.digitalClose },
+      { itemId: ID.digitalSide },
+    ],
+  },
   {
     name: "Flash",
     note: "Night, an on-camera flash, a shearling jacket and a black choker.",
@@ -49,7 +67,7 @@ const SERIES: SeriesSpec[] = [
   },
 ];
 
-/* How a series' prints share the stage: one fills it, two split it, three go one large and two stacked. */
+/* How a series' prints share the stage: one fills it, two split it, three or more go one large beside the rest. */
 const STAGE_LAYOUT: Record<number, string[]> = {
   1: ["inset-0"],
   2: ["inset-y-0 left-0 right-[calc(50%+1px)]", "inset-y-0 right-0 left-[calc(50%+1px)]"],
@@ -57,6 +75,19 @@ const STAGE_LAYOUT: Record<number, string[]> = {
     "inset-y-0 left-0 right-[calc(40%+1px)]",
     "top-0 right-0 bottom-[calc(50%+1px)] left-[calc(60%+1px)]",
     "bottom-0 right-0 top-[calc(50%+1px)] left-[calc(60%+1px)]",
+  ],
+  4: [
+    "top-0 left-0 right-[calc(50%+1px)] bottom-[calc(50%+1px)]",
+    "top-0 right-0 left-[calc(50%+1px)] bottom-[calc(50%+1px)]",
+    "bottom-0 left-0 right-[calc(50%+1px)] top-[calc(50%+1px)]",
+    "bottom-0 right-0 left-[calc(50%+1px)] top-[calc(50%+1px)]",
+  ],
+  5: [
+    "inset-y-0 left-0 right-[calc(60%+1px)]",
+    "top-0 left-[calc(40%+1px)] right-[calc(30%+1px)] bottom-[calc(50%+1px)]",
+    "top-0 left-[calc(70%+1px)] right-0 bottom-[calc(50%+1px)]",
+    "bottom-0 left-[calc(40%+1px)] right-[calc(30%+1px)] top-[calc(50%+1px)]",
+    "bottom-0 left-[calc(70%+1px)] right-0 top-[calc(50%+1px)]",
   ],
 };
 
@@ -99,9 +130,9 @@ export default function GallerySection({ data }: { data: Portfolio }) {
           },
         });
       });
-      const count = Math.min(all.length - start, 3);
+      const count = Math.min(all.length - start, 5);
       if (count > 0) kept.push({ ...spec, start, count });
-      all.length = start + count; // a stage holds three prints at most
+      all.length = start + count; // a stage holds five prints at most
     });
     return { series: kept, frames: all };
   }, [data.portfolio]);
@@ -221,7 +252,7 @@ export default function GallerySection({ data }: { data: Portfolio }) {
                   data-gl
                   onClick={() => open(s.start + k)}
                   aria-label={`Open ${f.item.title} full screen`}
-                  className={`relative ${k === 0 && s.count !== 2 ? "col-span-2 aspect-[4/3]" : "aspect-[3/4]"}`}
+                  className={`relative ${k === 0 && s.count % 2 === 1 ? `col-span-2 ${s.tall ? "aspect-[4/5]" : "aspect-[4/3]"}` : "aspect-[3/4]"}`}
                 >
                   <Image
                     src={f.item.path}
